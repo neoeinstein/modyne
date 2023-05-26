@@ -27,17 +27,50 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - run: cargo clippy --all-targets --all-features
+
+  test-min:
+    name: Test Minimal Versions
+    runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --no-fail-fast --all-features --run-ignored all -Zminimal-versions
+      - run: cargo test --doc --no-fail-fast --all-features -Zminimal-versions
 
   test:
     name: Test
     runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --no-fail-fast --all-features
+      - run: cargo nextest run --no-fail-fast --all-features --run-ignored all
       - run: cargo test --doc --no-fail-fast --all-features
 
   deny:
