@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  localstack:
+    image: localstack/localstack
+    volumes:
+      - "/private${TMPDIR}/localstack:/var/lib/localstack"
+      - "./localstack:/docker-entrypoint-initaws.d"
+      - "./localstack:/etc/localstack/init/ready.d" # for intel chip Mac
+    healthcheck:
+      test: awslocal dynamodb list-tables
+      interval: 60s
+      timeout: 10s
+    environment:
+      - SERVICES=dynamodb
+      - EAGER_SERVICE_LOADING=1  
+    ports:
+      - "4566:4566"
+      #- "4510-4559:4510-4559"
