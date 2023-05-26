@@ -25,10 +25,11 @@ serde_dynamo = { version = "4.2.2", features = ["aws-sdk-dynamodb+0_27"] }
 thiserror = "1.0.38"
 time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
 tokio = { version = "1.0", features = ["sync"] }
-tracing = "0.1.35"
+tracing = "0.1.36"
 
 [dev-dependencies]
 aws-credential-types = "0.55.1"
+castaway = "0.2.1"
 compact_str = { version = "0.7.0", features = ["serde"] }
 futures = "0.3.27"
 pin-project-lite = "0.2.9"
