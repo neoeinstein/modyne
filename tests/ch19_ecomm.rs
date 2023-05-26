@@ -23,9 +23,9 @@ impl App {
         Self::new_with_table(client, "EcommerceTable")
     }
 
-    pub fn new_with_table(client: aws_sdk_dynamodb::Client, table_name: impl Into<String>) -> Self {
+    pub fn new_with_table(client: aws_sdk_dynamodb::Client, table_name: &str) -> Self {
         Self {
-            table_name: std::sync::Arc::from(table_name.into()),
+            table_name: std::sync::Arc::from(table_name),
             client,
         }
     }
