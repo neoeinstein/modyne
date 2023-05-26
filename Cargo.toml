@@ -14,7 +14,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-aliri_braid = "0.3.1"
+aliri_braid = "0.4.0"
 async-trait = "0.1.66"
 aws-config = "0.55.1"
 aws-sdk-dynamodb = "0.27.0"
