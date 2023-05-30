@@ -288,7 +288,7 @@ use std::collections::HashMap;
 use aws_sdk_dynamodb::types::AttributeValue;
 use keys::{IndexKeys, PrimaryKey};
 use model::{ConditionCheck, ConditionalPut, Delete, Get, Put, Query, Scan, Update};
-use serde_dynamo::aws_sdk_dynamodb_0_27 as codec;
+use serde_dynamo::aws_sdk_dynamodb_0_28 as codec;
 
 pub use crate::error::Error;
 
