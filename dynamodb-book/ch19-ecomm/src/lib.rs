@@ -8,7 +8,7 @@ use std::collections::HashMap;
 use aliri_braid::braid;
 use modyne::{
     expr, keys, model::TransactWrite, projections, read_projection, Aggregate, Entity, EntityExt,
-    EntityTypeNameRef, Error, Item, Projection, QueryInput, QueryInputExt, Table,
+    Error, Item, Projection, QueryInput, QueryInputExt, Table,
 };
 use svix_ksuid::{Ksuid, KsuidLike};
 
@@ -167,7 +167,7 @@ pub struct UserName;
 #[braid(serde)]
 pub struct UserEmail;
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Customer {
     pub user_name: UserName,
     pub name: String,
@@ -183,10 +183,6 @@ pub struct Address {
 }
 
 impl Entity for Customer {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("customer");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["user_name", "name", "email", "addresses"];
-
     type KeyInput<'a> = &'a UserNameRef;
     type Table = App;
     type IndexKeys = ();
@@ -204,17 +200,13 @@ impl Entity for Customer {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 struct CustomerEmail {
     user_name: UserName,
     email: UserEmail,
 }
 
 impl Entity for CustomerEmail {
-    const ENTITY_TYPE: &'static EntityTypeNameRef =
-        EntityTypeNameRef::from_static("customer_email");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_name", "email"];
-
     type KeyInput<'a> = &'a UserEmailRef;
     type Table = App;
     type IndexKeys = ();
@@ -259,7 +251,7 @@ impl std::str::FromStr for OrderId {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Order {
     pub user_name: UserName,
     pub order_id: OrderId,
@@ -285,16 +277,6 @@ pub struct OrderKeyInput<'a> {
 }
 
 impl Entity for Order {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("order");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "user_name",
-        "order_id",
-        "created_at",
-        "number_of_items",
-        "amount",
-        "status",
-    ];
-
     type KeyInput<'a> = OrderKeyInput<'a>;
     type Table = App;
     type IndexKeys = keys::Gsi1;
@@ -323,7 +305,7 @@ impl Entity for Order {
 #[braid(serde)]
 pub struct ItemId;
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct OrderItem {
     pub order_id: Ksuid,
     pub item_id: ItemId,
@@ -338,10 +320,6 @@ pub struct OrderItemKeyInput<'a> {
 }
 
 impl Entity for OrderItem {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("order_item");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["order_id", "item_id", "description", "price"];
-
     type KeyInput<'a> = OrderItemKeyInput<'a>;
     type Table = App;
     type IndexKeys = keys::Gsi1;

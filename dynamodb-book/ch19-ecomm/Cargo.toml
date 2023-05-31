@@ -9,7 +9,7 @@ publish = false
 [dependencies]
 aliri_braid = "0.4.0"
 aws-sdk-dynamodb = "0.28.0"
-modyne = { path = "../.." }
+modyne = { path = "../..", features = ["derive"] }
 serde = { version = "1.0.158", features = ["derive"] }
 svix-ksuid = { version = "0.7.0", features = ["serde"] }
 time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }

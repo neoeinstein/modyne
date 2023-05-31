@@ -4,7 +4,7 @@
 
 use aliri_braid::braid;
 use modyne::{
-    expr, keys, types::Expiry, Aggregate, Entity, EntityExt, EntityTypeNameRef, Error, Projection,
+    expr, keys, types::Expiry, Aggregate, Entity, EntityDef, EntityExt, Error, Projection,
     ProjectionExt, QueryInput, QueryInputExt, Table,
 };
 
@@ -149,7 +149,7 @@ impl keys::IndexKey for UsernameKey {
     .into_index();
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Session {
     pub session_token: uuid::Uuid,
     pub username: Username,
@@ -161,15 +161,6 @@ pub struct Session {
 }
 
 impl Entity for Session {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("session");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "session_token",
-        "username",
-        "created_at",
-        "expires_at",
-        "ttl",
-    ];
-
     type KeyInput<'a> = uuid::Uuid;
     type Table = App;
     type IndexKeys = UsernameKey;

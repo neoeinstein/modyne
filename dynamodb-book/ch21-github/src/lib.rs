@@ -6,7 +6,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use aliri_braid::braid;
 use compact_str::{format_compact, CompactString};
-use modyne::{keys, Entity, EntityTypeNameRef, Table};
+use modyne::{keys, Entity, Table};
 use svix_ksuid::Ksuid;
 use time::format_description::well_known::Rfc3339;
 
@@ -69,7 +69,7 @@ impl RepositoryIdentity {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Repository {
     #[serde(flatten)]
     pub id: RepositoryIdentity,
@@ -83,18 +83,6 @@ pub struct Repository {
 }
 
 impl Entity for Repository {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("repo");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "created_at",
-        "updated_at",
-        "issues_and_pull_request_count",
-        "fork_source",
-        "fork_count",
-        "star_count",
-    ];
-
     type KeyInput<'a> = RepositoryId<'a>;
     type Table = App;
     type IndexKeys = (keys::Gsi1, keys::Gsi2, keys::Gsi3);
@@ -146,7 +134,7 @@ pub struct IssueId<'a> {
     issue_number: u32,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Issue {
     #[serde(flatten)]
     pub repo: RepositoryIdentity,
@@ -157,16 +145,6 @@ pub struct Issue {
 }
 
 impl Entity for Issue {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("issue");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "created_at",
-        "issue_number",
-        "status",
-        "star_count",
-    ];
-
     type KeyInput<'a> = IssueId<'a>;
     type Table = App;
     type IndexKeys = ();
@@ -202,7 +180,7 @@ pub struct IssueCommentId<'a> {
     comment_id: Ksuid,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct IssueComment {
     #[serde(flatten)]
     pub repo: RepositoryIdentity,
@@ -214,17 +192,6 @@ pub struct IssueComment {
 }
 
 impl Entity for IssueComment {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("issue_comment");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "created_at",
-        "issue_number",
-        "comment_id",
-        "comment",
-        "star_count",
-    ];
-
     type KeyInput<'a> = IssueCommentId<'a>;
     type Table = App;
     type IndexKeys = ();
@@ -257,7 +224,7 @@ pub struct PullRequestId<'a> {
     pull_request_number: u32,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct PullRequest {
     #[serde(flatten)]
     pub repo: RepositoryIdentity,
@@ -267,15 +234,6 @@ pub struct PullRequest {
 }
 
 impl Entity for PullRequest {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("pr");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "created_at",
-        "pull_request_number",
-        "star_count",
-    ];
-
     type KeyInput<'a> = PullRequestId<'a>;
     type Table = App;
     type IndexKeys = keys::Gsi1;
@@ -312,7 +270,7 @@ pub struct PullRequestCommentId<'a> {
     comment_id: Ksuid,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct PullRequestComment {
     #[serde(flatten)]
     pub repo: RepositoryIdentity,
@@ -324,17 +282,6 @@ pub struct PullRequestComment {
 }
 
 impl Entity for PullRequestComment {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("pr_comment");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "created_at",
-        "pull_request_number",
-        "comment_id",
-        "comment",
-        "star_count",
-    ];
-
     type KeyInput<'a> = PullRequestCommentId<'a>;
     type Table = App;
     type IndexKeys = ();
@@ -367,17 +314,13 @@ pub struct StarId<'a> {
     pub staring_user: &'a OwnerNameRef,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Star {
     pub repo: RepositoryIdentity,
     pub staring_user: OwnerName,
 }
 
 impl Entity for Star {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("star");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["repo_owner", "repo_name", "staring_user"];
-
     type KeyInput<'a> = StarId<'a>;
     type Table = App;
     type IndexKeys = ();
@@ -426,7 +369,7 @@ impl ReactionTarget {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Reaction {
     #[serde(flatten)]
     pub repo: RepositoryIdentity,
@@ -442,16 +385,6 @@ pub struct Reaction {
 }
 
 impl Entity for Reaction {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("reaction");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "repo_owner",
-        "repo_name",
-        "target_type",
-        "target_id",
-        "reacting_user",
-        "reaction",
-    ];
-
     type KeyInput<'a> = ReactionId<'a>;
     type Table = App;
     type IndexKeys = ();
@@ -477,7 +410,6 @@ impl Entity for Reaction {
             primary: Self::primary_key(ReactionId {
                 repo: self.repo.borrowed(),
                 target_type: self.target_type,
-
                 reacting_user: &self.reacting_user,
             }),
             indexes: (),
@@ -485,7 +417,7 @@ impl Entity for Reaction {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct User {
     pub username: OwnerName,
     pub created_at: time::OffsetDateTime,
@@ -494,10 +426,6 @@ pub struct User {
 }
 
 impl Entity for User {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("user");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["username", "created_at", "organizations", "payment_plan"];
-
     type KeyInput<'a> = &'a OwnerNameRef;
     type Table = App;
     type IndexKeys = keys::Gsi3;
@@ -528,7 +456,7 @@ pub enum Role {
     Member,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Organization {
     pub organization_name: OwnerName,
     pub created_at: time::OffsetDateTime,
@@ -536,10 +464,6 @@ pub struct Organization {
 }
 
 impl Entity for Organization {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("organization");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["organization_name", "created_at", "payment_plan"];
-
     type KeyInput<'a> = &'a OwnerNameRef;
     type Table = App;
     type IndexKeys = keys::Gsi3;
@@ -570,7 +494,7 @@ pub struct MembershipId<'a> {
     pub username: &'a OwnerNameRef,
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Membership {
     pub organization: OwnerName,
     pub username: OwnerName,
@@ -579,10 +503,6 @@ pub struct Membership {
 }
 
 impl Entity for Membership {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("membership");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["organization", "username", "created_at", "role"];
-
     type KeyInput<'a> = MembershipId<'a>;
     type Table = App;
     type IndexKeys = ();

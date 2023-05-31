@@ -11,7 +11,7 @@ aliri_braid = "0.4.0"
 aws-sdk-dynamodb = "0.28.0"
 castaway = "0.2.1"
 compact_str = { version = "0.7.0", features = ["serde"] }
-modyne = { path = "../.." }
+modyne = { path = "../..", features = ["derive"] }
 serde = { version = "1.0.158", features = ["derive"] }
 serde_dynamo = "4.2.3"
 svix-ksuid = { version = "0.7.0", features = ["serde"] }

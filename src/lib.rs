@@ -84,10 +84,10 @@
 //! in a DynamoDB table. An entity will always have the same primary key as the assoicated table,
 //! but may also participate in zero or more secondary indexes.
 //!
-//! For more information on setting up an entity, see [`Entity`].
+//! For more information on setting up an entity, see [`EntityDef`] and [`Entity`].
 //!
 //! ```
-//! use modyne::{keys, Entity, EntityTypeNameRef};
+//! use modyne::{keys, Entity, EntityDef};
 //! #
 //! # struct Database;
 //! #
@@ -98,16 +98,13 @@
 //! #     fn client(&self) -> &aws_sdk_dynamodb::Client {unimplemented!()}
 //! # }
 //!
-//! #[derive(Debug, serde::Serialize, serde::Deserialize)]
+//! #[derive(Debug, EntityDef, serde::Serialize, serde::Deserialize)]
 //! struct Session {
 //!     user_id: String,
 //!     session_token: String,
 //! }
 //!
 //! impl Entity for Session {
-//!     const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("session");
-//!     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_id", "session_token"];
-//!
 //!     type KeyInput<'a> = &'a str;
 //!     type Table = Database;
 //!     type IndexKeys = keys::Gsi1;
@@ -141,11 +138,9 @@
 //! #     fn table_name(&self) -> &str {unimplemented!()}
 //! #     fn client(&self) -> &aws_sdk_dynamodb::Client {unimplemented!()}
 //! # }
-//! # #[derive(Debug, serde::Serialize)]
+//! # #[derive(Debug, modyne::EntityDef, serde::Serialize)]
 //! # struct Session {user_id: String,session_token: String}
 //! # impl modyne::Entity for Session {
-//! #     const ENTITY_TYPE: &'static modyne::EntityTypeNameRef = modyne::EntityTypeNameRef::from_static("session");
-//! #     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_id", "session_token"];
 //! #     type KeyInput<'a> = &'a str;
 //! #     type Table = Database;
 //! #     type IndexKeys = ();
@@ -188,11 +183,9 @@
 //! #     fn client(&self) -> &aws_sdk_dynamodb::Client {unimplemented!()}
 //! # }
 //! #
-//! # #[derive(Debug, serde::Serialize, serde::Deserialize)]
+//! # #[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 //! # struct Session {user_id: String,session_token: String}
 //! # impl modyne::Entity for Session {
-//! #     const ENTITY_TYPE: &'static modyne::EntityTypeNameRef = modyne::EntityTypeNameRef::from_static("session");
-//! #     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_id", "session_token"];
 //! #     type KeyInput<'a> = &'a str;
 //! #     type Table = Database;
 //! #     type IndexKeys = modyne::keys::Gsi1;
@@ -200,11 +193,9 @@
 //! #     fn full_key(&self) -> modyne::keys::FullKey<modyne::keys::Primary, Self::IndexKeys> {unimplemented!()}
 //! # }
 //! #
-//! # #[derive(Debug, serde::Serialize, serde::Deserialize)]
+//! # #[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 //! # struct UserMetadata {user_id: String}
 //! # impl modyne::Entity for UserMetadata {
-//! #     const ENTITY_TYPE: &'static modyne::EntityTypeNameRef = modyne::EntityTypeNameRef::from_static("user_metadata");
-//! #     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_id"];
 //! #     type KeyInput<'a> = &'a str;
 //! #     type Table = Database;
 //! #     type IndexKeys = modyne::keys::Gsi1;
@@ -288,6 +279,8 @@ use std::collections::HashMap;
 use aws_sdk_dynamodb::types::AttributeValue;
 use keys::{IndexKeys, PrimaryKey};
 use model::{ConditionCheck, ConditionalPut, Delete, Get, Put, Query, Scan, Update};
+#[cfg(feature = "derive")]
+pub use modyne_derive::EntityDef;
 use serde_dynamo::aws_sdk_dynamodb_0_28 as codec;
 
 pub use crate::error::Error;
@@ -302,7 +295,6 @@ pub type Item = HashMap<String, AttributeValue>;
 pub struct EntityTypeName;
 
 /// A description of a DynamoDB table
-
 pub trait Table {
     /// The primary key to be used for the table
     type PrimaryKey: keys::PrimaryKey;
@@ -317,7 +309,77 @@ pub trait Table {
     fn client(&self) -> &aws_sdk_dynamodb::Client;
 }
 
-/// An entity definition for a DynamoDB table.
+/// The name and attribute definition for an [`Entity`]
+///
+/// This trait is used to define the structure of an entity type in a
+/// DynamoDB table and how the entity may be queried.
+///
+/// This trait can be implemented manually, but may be better implemented
+/// using the derive macro when using the `derive` feature on this crate.
+/// Manual implementation may lead to the projected attributes going out
+/// of sync with the entity's attributes.
+///
+/// ## Example
+///
+/// ```
+/// use modyne::EntityDef;
+///
+/// #[derive(EntityDef)]
+/// #[serde(rename = "orange", rename_all = "kebab-case")]
+/// struct MyStruct {
+///     field_1: u32,
+///     #[serde(rename = "second-field")]
+///     field_2: u32,
+/// }
+/// ```
+///
+/// The above is equivalent to the following manual definition:
+///
+/// ```
+/// use modyne::{EntityDef, EntityTypeNameRef};
+///
+/// struct MyStruct {
+///     field_1: u32,
+///     field_2: u32,
+/// }
+///
+/// impl EntityDef for MyStruct {
+///     const ENTITY_TYPE: &'static EntityTypeNameRef =
+///         EntityTypeNameRef::from_static("orange");
+///
+///     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
+///         "field_1",
+///         "second-field",
+///     ];
+/// }
+/// ```
+///
+/// If a field is marked with serde's `flatten` modifier, then the projected
+/// attributes array will be empty due to the inability of the derive macro
+/// to inspect the fields that are available on the flattened type.
+pub trait EntityDef {
+    /// The name of the entity type
+    ///
+    /// This value will be used to set the `entity_type` attribute on
+    /// all items of this entity type in the DynamoDB table and should
+    /// be unique across all entity types in the table.
+    const ENTITY_TYPE: &'static EntityTypeNameRef;
+
+    /// The set of attributes that are projected into the entity
+    ///
+    /// By default, all attributes, including the index keys, are
+    /// projected into the entity. This can be overridden to only
+    /// project the subset of attributes that are needed for the
+    /// entity's use cases.
+    ///
+    /// Use of this attribute is optional, but recommended. If not
+    /// specified, then any aggregate that uses this entity type will
+    /// return the entire item from DynamoDB, which can lead to
+    /// unnecessary network and deserialization overhead.
+    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[];
+}
+
+/// An entity in a DynamoDB table
 ///
 /// This trait is used to define the structure of an entity type in a
 /// DynamoDB table and how the entity may be queried.
@@ -334,7 +396,7 @@ pub trait Table {
 /// efficiently query for recent orders for a given user.
 ///
 /// ```
-/// use modyne::{keys, Entity, EntityTypeNameRef};
+/// use modyne::{keys, Entity, EntityDef};
 /// # use time::format_description::well_known::Rfc3339;
 /// #
 /// # struct App;
@@ -345,7 +407,7 @@ pub trait Table {
 /// #     fn client(&self) -> &aws_sdk_dynamodb::Client { unimplemented!() }
 /// # }
 ///
-/// #[derive(Debug, serde::Serialize, serde::Deserialize)]
+/// #[derive(Debug, EntityDef, serde::Serialize, serde::Deserialize)]
 /// struct Order {
 ///     user_id: String,
 ///     order_id: String,
@@ -365,8 +427,6 @@ pub trait Table {
 /// }
 ///
 /// impl Entity for Order {
-///     const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("order");
-///
 ///     type KeyInput<'a> = OrderKeyInput<'a>;
 ///     type Table = App;
 ///     type IndexKeys = keys::Gsi1;
@@ -390,27 +450,7 @@ pub trait Table {
 ///     }
 /// }
 /// ```
-pub trait Entity: Sized {
-    /// The name of the entity type.
-    ///
-    /// This value will be used to set the `entity_type` attribute on
-    /// all items of this entity type in the DynamoDB table and should
-    /// be unique across all entity types in the table.
-    const ENTITY_TYPE: &'static EntityTypeNameRef;
-
-    /// The set of attributes that are projected into the entity.
-    ///
-    /// By default, all attributes, including the index keys, are
-    /// projected into the entity. This can be overridden to only
-    /// project the subset of attributes that are needed for the
-    /// entity's use cases.
-    ///
-    /// Use of this attribute is optional, but recommended. If not
-    /// specified, then any aggregate that uses this entity type will
-    /// return the entire item from DynamoDB, which can lead to
-    /// unnecessary network and deserialization overhead.
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[];
-
+pub trait Entity: EntityDef + Sized {
     /// The inputs required to generate the entity's primary key.
     ///
     /// This can be a single type or a tuple of types. Note that all
@@ -603,7 +643,7 @@ pub trait Projection: Sized {
     /// this projection will return the entire item from DynamoDB, which
     /// can lead to unnecessary network and deserialization overhead.
     const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        <Self::Entity as Entity>::PROJECTED_ATTRIBUTES;
+        <Self::Entity as EntityDef>::PROJECTED_ATTRIBUTES;
 
     /// The entity type that this projection represents
     type Entity: Entity;
@@ -676,7 +716,7 @@ macro_rules! projections {
 
                 let parsed =
                 $(
-                    if entity_type == <<$ty as $crate::Projection>::Entity as $crate::Entity>::ENTITY_TYPE {
+                    if entity_type == <<$ty as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
                         let parsed = <$ty as $crate::ProjectionExt>::from_item(item)
                             .map(Self::$ty)?;
                         ::std::option::Option::Some(parsed)
@@ -715,9 +755,11 @@ macro_rules! projections {
 /// # }
 /// #
 /// # struct User {}
-/// # impl modyne::Entity for User {
+/// # impl modyne::EntityDef for User {
 /// #     const ENTITY_TYPE: &'static modyne::EntityTypeNameRef = modyne::EntityTypeNameRef::from_static("user");
 /// #     const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_id"];
+/// # }
+/// # impl modyne::Entity for User {
 /// #     type KeyInput<'a> = &'a str;
 /// #     type Table = Database;
 /// #     type IndexKeys = modyne::keys::Gsi1;
@@ -811,7 +853,7 @@ where
         match item.get(ENTITY_TYPE_ATTRIBUTE) {
             Some(AttributeValue::S(entity_type)) => {
                 let entity_type = EntityTypeNameRef::from_str(entity_type);
-                if entity_type == <P::Entity as Entity>::ENTITY_TYPE {
+                if entity_type == <P::Entity as EntityDef>::ENTITY_TYPE {
                     let parsed = P::from_item(item)?;
                     Ok(Some(parsed))
                 } else {
@@ -1214,9 +1256,11 @@ mod tests {
         email: String,
     }
 
-    impl Entity for TestEntity {
+    impl EntityDef for TestEntity {
         const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("test_ent");
+    }
 
+    impl Entity for TestEntity {
         type KeyInput<'a> = (&'a str, &'a str);
         type Table = TestTable;
         type IndexKeys = keys::Gsi13;

@@ -11,8 +11,8 @@ use modyne::{
     expr,
     keys::{self, IndexKey},
     model::{Scan, ScanSegment, TransactWrite},
-    projections, read_projection, Aggregate, Entity, EntityExt, EntityTypeNameRef, Error, Item,
-    ProjectionExt, QueryInput, QueryInputExt, ScanInput, Table,
+    projections, read_projection, Aggregate, Entity, EntityExt, Error, Item, ProjectionExt,
+    QueryInput, QueryInputExt, ScanInput, Table,
 };
 use serde_dynamo::string_set::StringSet;
 use svix_ksuid::{Ksuid, KsuidLike};
@@ -57,9 +57,11 @@ impl App {
     }
 
     pub async fn create_brand(&self, brand: Brand) -> Result<(), Error> {
-        let expression = expr::Update::new("ADD #brands :brands")
+        let expression = expr::Update::new("ADD #brands :brands SET #entity_type = :entity_type")
             .name("#brands", "brands")
-            .value(":brands", StringSet(vec![&brand.brand_name]));
+            .value(":brands", StringSet(vec![&brand.brand_name]))
+            .name("#entity_type", "entity_type")
+            .value(":entity_type", <Brands as modyne::EntityDef>::ENTITY_TYPE);
         let update = Brands::update(()).expression(expression);
 
         TransactWrite::new()
@@ -596,7 +598,7 @@ impl std::str::FromStr for DealId {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Deal {
     pub deal_id: DealId,
     pub title: String,
@@ -609,17 +611,6 @@ pub struct Deal {
 }
 
 impl Entity for Deal {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("deal");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "deal_id",
-        "title",
-        "link",
-        "price",
-        "category",
-        "brand",
-        "created_at",
-    ];
-
     type KeyInput<'a> = DealId;
     type Table = App;
     type IndexKeys = (keys::Gsi1, keys::Gsi2, keys::Gsi3);
@@ -654,7 +645,7 @@ impl Entity for Deal {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Brand {
     pub brand_name: BrandName,
     pub brand_logo_url: String,
@@ -662,10 +653,6 @@ pub struct Brand {
 }
 
 impl Entity for Brand {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("brand");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["brand_name", "brand_logo_url", "likes"];
-
     type KeyInput<'a> = &'a BrandNameRef;
     type Table = App;
     type IndexKeys = ();
@@ -686,16 +673,13 @@ impl Entity for Brand {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct BrandLike {
     pub brand_name: BrandName,
     pub user_name: UserName,
 }
 
 impl Entity for BrandLike {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("brand_like");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["brand_name", "user_name"];
-
     type KeyInput<'a> = (&'a BrandNameRef, &'a UserNameRef);
     type Table = App;
     type IndexKeys = ();
@@ -720,16 +704,13 @@ impl Entity for BrandLike {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct BrandWatch {
     pub brand_name: BrandName,
     pub user_name: UserName,
 }
 
 impl Entity for BrandWatch {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("brand_watch");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["brand_name", "user_name"];
-
     type KeyInput<'a> = (&'a BrandNameRef, &'a UserNameRef);
     type Table = App;
     type IndexKeys = ();
@@ -749,7 +730,7 @@ impl Entity for BrandWatch {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Brands {
     #[serde(
         default,
@@ -760,9 +741,6 @@ pub struct Brands {
 }
 
 impl Entity for Brands {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("brands");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["brands"];
-
     type KeyInput<'a> = ();
     type Table = App;
     type IndexKeys = ();
@@ -782,7 +760,7 @@ impl Entity for Brands {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Category {
     pub category_name: CategoryName,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -796,10 +774,6 @@ pub struct FeaturedDeal {
 }
 
 impl Entity for Category {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("category");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] =
-        &["category_name", "featured_deals", "likes"];
-
     type KeyInput<'a> = &'a CategoryNameRef;
     type Table = App;
     type IndexKeys = ();
@@ -820,16 +794,13 @@ impl Entity for Category {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct CategoryLike {
     pub category_name: CategoryName,
     pub user_name: UserName,
 }
 
 impl Entity for CategoryLike {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("category_like");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["category_name", "user_name"];
-
     type KeyInput<'a> = (&'a CategoryNameRef, &'a UserNameRef);
     type Table = App;
     type IndexKeys = ();
@@ -854,17 +825,13 @@ impl Entity for CategoryLike {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct CategoryWatch {
     pub category_name: CategoryName,
     pub user_name: UserName,
 }
 
 impl Entity for CategoryWatch {
-    const ENTITY_TYPE: &'static EntityTypeNameRef =
-        EntityTypeNameRef::from_static("category_watch");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["category_name", "user_name"];
-
     type KeyInput<'a> = (&'a CategoryNameRef, &'a UserNameRef);
     type Table = App;
     type IndexKeys = ();
@@ -884,16 +851,13 @@ impl Entity for CategoryWatch {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct FrontPage {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub featured_deals: Vec<FeaturedDeal>,
 }
 
 impl Entity for FrontPage {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("front_page");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["featured_deals"];
-
     type KeyInput<'a> = ();
     type Table = App;
     type IndexKeys = ();
@@ -913,16 +877,13 @@ impl Entity for FrontPage {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct EditorsChoice {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub featured_deals: Vec<FeaturedDeal>,
 }
 
 impl Entity for EditorsChoice {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("editor_choice");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["featured_deals"];
-
     type KeyInput<'a> = ();
     type Table = App;
     type IndexKeys = ();
@@ -942,7 +903,7 @@ impl Entity for EditorsChoice {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct User {
     pub user_name: UserName,
     #[serde(with = "time::serde::rfc3339")]
@@ -965,9 +926,6 @@ impl keys::IndexKey for UserIndex {
 }
 
 impl Entity for User {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("user");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_name", "created_at"];
-
     type KeyInput<'a> = &'a UserNameRef;
     type Table = App;
     type IndexKeys = UserIndex;
@@ -1016,7 +974,7 @@ impl std::str::FromStr for MessageId {
     }
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, modyne::EntityDef, serde::Serialize, serde::Deserialize)]
 pub struct Message {
     pub user_name: UserName,
     pub message_id: MessageId,
@@ -1028,16 +986,6 @@ pub struct Message {
 }
 
 impl Entity for Message {
-    const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("message");
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &[
-        "user_name",
-        "message_id",
-        "subject",
-        "body",
-        "unread",
-        "created_at",
-    ];
-
     type KeyInput<'a> = (&'a UserNameRef, MessageId);
     type Table = App;
     type IndexKeys = Option<keys::Gsi1>;
