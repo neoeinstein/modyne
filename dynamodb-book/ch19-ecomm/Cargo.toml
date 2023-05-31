@@ -1,0 +1,23 @@
+[package]
+name = "dynamodb-book-ch19-ecomm"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+aliri_braid = "0.4.0"
+aws-sdk-dynamodb = "0.28.0"
+modyne = { path = "../.." }
+serde = { version = "1.0.158", features = ["derive"] }
+svix-ksuid = { version = "0.7.0", features = ["serde"] }
+time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
+tracing = "0.1.36"
+
+[dev-dependencies]
+aws-config = "0.55.3"
+aws-credential-types = "0.55.3"
+test-log = { version = "0.2.11", default-features = false, features = ["trace"] }
+tokio = { version = "1.0", features = ["macros"] }
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }

@@ -42,8 +42,6 @@ impl Table for App {
     }
 }
 
-impl App {}
-
 #[braid(serde)]
 pub struct OwnerName(CompactString);
 

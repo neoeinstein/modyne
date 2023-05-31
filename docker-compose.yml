@@ -5,8 +5,8 @@ services:
     image: localstack/localstack
     volumes:
       - "/private${TMPDIR}/localstack:/var/lib/localstack"
-      - "./localstack:/docker-entrypoint-initaws.d"
-      - "./localstack:/etc/localstack/init/ready.d" # for intel chip Mac
+      # - "./localstack:/docker-entrypoint-initaws.d"
+      # - "./localstack:/etc/localstack/init/ready.d" # for intel chip Mac
     healthcheck:
       test: awslocal dynamodb list-tables
       interval: 60s

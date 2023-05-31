@@ -6,7 +6,6 @@ use core::fmt;
 use std::collections::HashMap;
 
 use aliri_braid::braid;
-use aws_sdk_dynamodb::types::AttributeValue;
 use modyne::{
     expr, keys, model::TransactWrite, projections, read_projection, Aggregate, Entity, EntityExt,
     EntityTypeNameRef, Error, Item, Projection, QueryInput, QueryInputExt, Table,
@@ -460,34 +459,37 @@ impl Aggregate for OrderWithItems {
     }
 }
 
+#[cfg(test)]
 mod tests {
+    use aws_sdk_dynamodb::types::AttributeValue;
+
     use super::*;
 
     #[test]
     fn verify_user_orders_entities_projection_expression() {
         assert_eq!(
-            <CustomerOrdersEntities as modyne::ProjectionSet>::projection_expression(),
-            Some(expr::StaticProjection {
-                expression: "user_name,order_id,created_at,number_of_items,amount,#prj_000,#prj_001,email,entity_type",
-                names: &[
-                    ("#prj_000", "status"),
-                    ("#prj_001", "name"),
-                ],
-            })
-        );
+        <CustomerOrdersEntities as modyne::ProjectionSet>::projection_expression(),
+        Some(expr::StaticProjection {
+            expression: "user_name,order_id,created_at,number_of_items,amount,#prj_000,#prj_001,email,entity_type",
+            names: &[
+                ("#prj_000", "status"),
+                ("#prj_001", "name"),
+            ],
+        })
+    );
     }
 
     #[test]
     fn verify_order_with_items_entities_projection_expression() {
         assert_eq!(
-            <OrderWithItemsEntities as modyne::ProjectionSet>::projection_expression(),
-            Some(expr::StaticProjection {
-                expression: "user_name,order_id,created_at,number_of_items,amount,#prj_000,item_id,description,price,entity_type",
-                names: &[
-                    ("#prj_000", "status"),
-                ],
-            }),
-        );
+        <OrderWithItemsEntities as modyne::ProjectionSet>::projection_expression(),
+        Some(expr::StaticProjection {
+            expression: "user_name,order_id,created_at,number_of_items,amount,#prj_000,item_id,description,price,entity_type",
+            names: &[
+                ("#prj_000", "status"),
+            ],
+        }),
+    );
     }
 
     #[test]
