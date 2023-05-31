@@ -541,13 +541,12 @@ macro_rules! once_projection_expression {
             )*
         ];
 
-        static PROJECTION_ONCE: $crate::__private::OnceBox<
+        static PROJECTION_ONCE: ::std::sync::OnceLock<
             ::std::option::Option<$crate::expr::StaticProjection>,
-        > = $crate::__private::OnceBox::new();
+        > = ::std::sync::OnceLock::new();
 
         *PROJECTION_ONCE.get_or_init(|| {
-            let expr = $crate::__private::generate_projection_expression(PROJECTIONS);
-            ::std::boxed::Box::new(expr)
+            $crate::__private::generate_projection_expression(PROJECTIONS)
         })
     }};
 }
@@ -841,8 +840,6 @@ struct FullEntity<T: Entity> {
 
 #[doc(hidden)]
 pub mod __private {
-    pub use once_cell::race::OnceBox;
-
     #[inline]
     pub fn get_entity_type(item: &crate::Item) -> Result<&crate::EntityTypeNameRef, crate::Error> {
         let entity_type = item

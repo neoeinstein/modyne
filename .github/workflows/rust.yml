@@ -52,6 +52,30 @@ jobs:
       - run: cargo nextest run --workspace --no-fail-fast --all-features --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --all-features -Zminimal-versions
 
+
+  test-msrv:
+    name: Test MSRV
+    runs-on: ubuntu-latest
+    services:
+      localstack:
+        image: localstack/localstack
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.70.0
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --workspace --no-fail-fast --all-features --run-ignored all
+      - run: cargo test --workspace --doc --no-fail-fast --all-features
+
   test:
     name: Test
     runs-on: ubuntu-latest

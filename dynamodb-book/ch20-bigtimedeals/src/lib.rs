@@ -1189,12 +1189,11 @@ impl QueryInput for CategoryDealsByDateQuery<'_> {
 }
 
 fn format_as_date(time: time::Date) -> String {
-    static FORMAT: once_cell::race::OnceBox<Vec<time::format_description::FormatItem<'static>>> =
-        once_cell::race::OnceBox::new();
+    static FORMAT: std::sync::OnceLock<Vec<time::format_description::FormatItem<'static>>> =
+        std::sync::OnceLock::new();
 
     let format = FORMAT.get_or_init(|| {
-        let format = time::format_description::parse_borrowed::<2>("[year]-[month]-[day]").unwrap();
-        Box::new(format)
+        time::format_description::parse_borrowed::<2>("[year]-[month]-[day]").unwrap()
     });
 
     time.format(format).unwrap()

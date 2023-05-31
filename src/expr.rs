@@ -557,16 +557,15 @@ impl Projection {
     }
 
     fn reserved_words() -> &'static FnvHashSet<&'static [u8]> {
-        static RESERVED_WORDS_SET: once_cell::race::OnceBox<FnvHashSet<&'static [u8]>> =
-            once_cell::race::OnceBox::new();
+        static RESERVED_WORDS_SET: std::sync::OnceLock<FnvHashSet<&'static [u8]>> =
+            std::sync::OnceLock::new();
 
         RESERVED_WORDS_SET.get_or_init(|| {
-            let set = Self::RESERVED_WORDS
+            Self::RESERVED_WORDS
                 .iter()
                 .copied()
                 .map(|s| s.as_bytes())
-                .collect();
-            Box::new(set)
+                .collect()
         })
     }
 
