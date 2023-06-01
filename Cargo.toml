@@ -12,6 +12,7 @@ repository = "https://github.com/neoeinstein/modyne"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 include = [
+    "/docs",
     "/src",
     "/examples",
     "/tests",
