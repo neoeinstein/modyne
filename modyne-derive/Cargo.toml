@@ -4,15 +4,13 @@ description = "Derive macros for modyne"
 version = "0.1.0"
 authors = ["Marcus Griep <marcus@griep.us>"]
 edition = "2021"
-readme = "README.md"
+readme = "../README.md"
 license = "MIT OR Apache-2.0"
 keywords = ["dynamodb","aws","aws-sdk","dynamo","orm"]
 categories = ["database","api-bindings"]
 documentation = "https://docs.rs/modyne-derive"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
 proc-macro = true

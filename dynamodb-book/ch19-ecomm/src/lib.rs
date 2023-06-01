@@ -1,6 +1,4 @@
-//! An example of using modyne to implement a simple single-table
-//! database for an e-commerce application as described in Chapter 19
-//! of the DynamoDB book.
+#![doc = include_str!("../README.md")]
 
 use core::fmt;
 use std::collections::HashMap;

@@ -1,6 +1,4 @@
-//! An example of using modyne to implement a single-table
-//! database for the "Big Time Deals" application as described in Chapter 20
-//! of the DynamoDB book.
+#![doc = include_str!("../README.md")]
 
 use std::collections::{BTreeMap, BTreeSet};
 

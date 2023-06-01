@@ -1,6 +1,4 @@
-//! An example of using modyne to implement a simple single-table
-//! database for a session store as described in Chapter 18
-//! of the DynamoDB book.
+#![doc = include_str!("../README.md")]
 
 use aliri_braid::braid;
 use modyne::{
