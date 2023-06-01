@@ -11,6 +11,7 @@ categories = ["database","api-bindings"]
 documentation = "https://docs.rs/modyne-derive"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
+rust-version = "1.66.1"
 
 [lib]
 proc-macro = true

@@ -5,7 +5,7 @@ _An opinionated library for interacting with AWS DynamoDB single-table designs._
 [![docs.rs](https://img.shields.io/docsrs/modyne)][docsrs]
 [![crates.io](https://img.shields.io/crates/v/modyne)][cratesio]
 ![MIT/Apache-2.0 dual licensed](https://img.shields.io/crates/l/modyne)
-![modyne: rustc 1.70+](https://img.shields.io/badge/modyne-rustc_1.70+-lightgray.svg)
+![modyne: rustc 1.70+](https://img.shields.io/badge/modyne-rustc_1.70+-lightgray.svg)†
 
 ## Motive
 
@@ -79,6 +79,11 @@ will only result in a minor version bump. If the AWS SDK exposes an observable
 breaking change to _modyne_, then a major version bump will be used. Prior to
 1.0, those bumps will be to the patch and minor version components,
 respectively.
+
+---
+
+†: The MSRV for this crate can be lowered to 1.66.1 by enabling the
+`once_cell` feature.
 
 [cratesio]: https://crates.io/crates/modyne
 [docsrs]: https://docs.rs/modyne
