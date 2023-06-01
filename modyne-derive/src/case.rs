@@ -1,5 +1,8 @@
 //! Code to convert the Rust-styled field/variant (e.g. `my_field`, `MyType`) to the
 //! case of the source (e.g. `my-field`, `MY_FIELD`).
+//!
+//! This code is taken with minimal changes from the `serde-derive` crate, under the
+//! Apache-2.0 and MIT licenses.
 
 // See https://users.rust-lang.org/t/psa-dealing-with-warning-unused-import-std-ascii-asciiext-in-today-s-nightly/13726
 #[allow(deprecated, unused_imports)]
