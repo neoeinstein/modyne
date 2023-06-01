@@ -5,6 +5,7 @@ use syn::{Ident, Path};
 #[derive(Copy, Clone)]
 pub struct Symbol(&'static str);
 
+pub const ENTITY: Symbol = Symbol("entity");
 pub const FLATTEN: Symbol = Symbol("flatten");
 pub const RENAME: Symbol = Symbol("rename");
 pub const RENAME_ALL: Symbol = Symbol("rename_all");

@@ -280,7 +280,7 @@ use aws_sdk_dynamodb::types::AttributeValue;
 use keys::{IndexKeys, PrimaryKey};
 use model::{ConditionCheck, ConditionalPut, Delete, Get, Put, Query, Scan, Update};
 #[cfg(feature = "derive")]
-pub use modyne_derive::EntityDef;
+pub use modyne_derive::{EntityDef, Projection};
 use serde_dynamo::aws_sdk_dynamodb_0_28 as codec;
 
 pub use crate::error::Error;
@@ -627,11 +627,14 @@ impl<T: Entity> EntityExt for T {}
 /// time won't be spent deserializing attributes that aren't needed.
 ///
 /// Note that this type does not automatically impose a projection expression on the DynamoDB
-/// operation, so network bandwidth will still be spent retrieving the full entity unless a
-/// projection expression is specified.
+/// operation, so network bandwidth will still be spent retrieving the full entity unless the
+/// projected attributes are specified.
 ///
 /// In addition, even if a projection expression is specified, the full size of an item will
 /// still be counted when computing the DynamoDB read capacity unit consumption.
+///
+/// For easier implementation, use `#[derive(Projection)]` to infer the projected attributes
+/// automatically.
 pub trait Projection: Sized {
     /// The set of attributes that are projected into the entity.
     ///

@@ -181,14 +181,10 @@ impl Entity for Session {
     }
 }
 
-#[derive(Clone, Debug, serde::Deserialize)]
+#[derive(Clone, Debug, Projection, serde::Deserialize)]
+#[entity(Session)]
 pub struct SessionTokenOnly {
     pub session_token: uuid::Uuid,
-}
-
-impl Projection for SessionTokenOnly {
-    type Entity = Session;
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["session_token"];
 }
 
 impl QueryInput for UsernameRef {

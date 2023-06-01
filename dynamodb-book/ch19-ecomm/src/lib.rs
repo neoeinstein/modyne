@@ -346,17 +346,12 @@ impl Entity for OrderItem {
 }
 
 /// A projection of customer data that does not include address information.
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Projection, serde::Serialize, serde::Deserialize)]
+#[entity(Customer)]
 pub struct CustomerHeader {
     pub user_name: UserName,
     pub name: String,
     pub email: UserEmail,
-}
-
-impl Projection for CustomerHeader {
-    const PROJECTED_ATTRIBUTES: &'static [&'static str] = &["user_name", "name", "email"];
-
-    type Entity = Customer;
 }
 
 #[derive(Debug, Default)]
