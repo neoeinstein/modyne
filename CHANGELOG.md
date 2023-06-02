@@ -4,4 +4,6 @@ The format of this changelog is based on [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
+## [0.1.0] - 2023-06-01
+
 - Initial release
