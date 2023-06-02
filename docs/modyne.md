@@ -131,7 +131,7 @@ impl Entity for Session {
 }
 ```
 
-Entities can be interacted with through utility methods on the [`EnitityExt`]
+Entities can be interacted with through utility methods on the [`EntityExt`]
 trait.
 
 ```
