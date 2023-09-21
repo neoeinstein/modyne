@@ -647,38 +647,56 @@ impl UpdateOne {
             .set_table_name(Some(table.table_name().into()))
             .return_consumed_capacity(ReturnConsumedCapacity::Total);
 
+        let needs_names = !self.inner.update.names.is_empty();
+        let mut names: Option<HashMap<String, String>> =
+            needs_names.then(|| self.inner.update.names.into_iter().collect());
+        let needs_values =
+            !self.inner.update.values.is_empty() || !self.inner.update.sensitive_values.is_empty();
+
+        let mut values: Option<HashMap<String, AttributeValue>> = needs_values.then(|| {
+            self.inner
+                .update
+                .values
+                .into_iter()
+                .chain(self.inner.update.sensitive_values)
+                .collect()
+        });
+
         if let Some(condition) = self.inner.condition {
             span.record("aws.dynamodb.conditional_expression", &condition.expression);
-            let names = if !condition.names.is_empty() {
-                let names: HashMap<_, _> = condition.names.into_iter().collect();
+            if !condition.names.is_empty() {
+                let condition_names: HashMap<_, _> = condition.names.into_iter().collect();
                 span.record(
                     "aws.dynamodb.expression_attribute_names",
                     field::debug(&names),
                 );
-                Some(names)
-            } else {
-                None
-            };
+                names = names.map(|mut names| {
+                    names.extend(condition_names);
+                    names
+                });
+            }
 
-            let values = if !condition.values.is_empty() || !condition.sensitive_values.is_empty() {
-                let mut values: Item = condition.values.into_iter().collect();
+            if !condition.values.is_empty() || !condition.sensitive_values.is_empty() {
+                let mut conditon_values: Item = condition.values.into_iter().collect();
                 span.record(
                     "aws.dynamodb.expression_attribute_values",
                     field::debug(&values),
                 );
 
-                values.extend(condition.sensitive_values);
+                conditon_values.extend(condition.sensitive_values);
 
-                Some(values)
-            } else {
-                None
-            };
+                values = values.map(|mut values| {
+                    values.extend(conditon_values);
+                    values
+                });
+            }
 
-            query = query
-                .set_condition_expression(Some(condition.expression))
-                .set_expression_attribute_names(names)
-                .set_expression_attribute_values(values)
+            query = query.set_condition_expression(Some(condition.expression));
         }
+
+        query = query
+            .set_expression_attribute_names(names)
+            .set_expression_attribute_values(values);
 
         let result = query.send().instrument(span.clone()).await;
 
