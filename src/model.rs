@@ -647,52 +647,59 @@ impl UpdateOne {
             .set_table_name(Some(table.table_name().into()))
             .return_consumed_capacity(ReturnConsumedCapacity::Total);
 
-        let needs_names = !self.inner.update.names.is_empty();
-        let mut names: Option<HashMap<String, String>> =
-            needs_names.then(|| self.inner.update.names.into_iter().collect());
-        let needs_values =
-            !self.inner.update.values.is_empty() || !self.inner.update.sensitive_values.is_empty();
+        let (cnd_names, cnd_values, cnd_sensitive_values) =
+            if let Some(condition) = self.inner.condition {
+                span.record("aws.dynamodb.conditional_expression", &condition.expression);
+                query = query.set_condition_expression(Some(condition.expression));
+                (
+                    condition.names,
+                    condition.values,
+                    condition.sensitive_values,
+                )
+            } else {
+                Default::default()
+            };
 
-        let mut values: Option<HashMap<String, AttributeValue>> = needs_values.then(|| {
-            self.inner
-                .update
-                .values
+        let needs_names = !cnd_names.is_empty() || !self.inner.update.names.is_empty();
+        let names = needs_names.then(|| {
+            cnd_names
                 .into_iter()
-                .chain(self.inner.update.sensitive_values)
+                .chain(self.inner.update.names)
                 .collect()
         });
 
-        if let Some(condition) = self.inner.condition {
-            span.record("aws.dynamodb.conditional_expression", &condition.expression);
-            if !condition.names.is_empty() {
-                let condition_names: HashMap<_, _> = condition.names.into_iter().collect();
-                span.record(
-                    "aws.dynamodb.expression_attribute_names",
-                    field::debug(&names),
-                );
-                names = names.map(|mut names| {
-                    names.extend(condition_names);
-                    names
-                });
-            }
+        span.record(
+            "aws.dynamodb.expression_attribute_names",
+            field::debug(&names),
+        );
 
-            if !condition.values.is_empty() || !condition.sensitive_values.is_empty() {
-                let mut conditon_values: Item = condition.values.into_iter().collect();
-                span.record(
-                    "aws.dynamodb.expression_attribute_values",
-                    field::debug(&values),
-                );
+        let needs_values = !cnd_values.is_empty()
+            || !cnd_sensitive_values.is_empty()
+            || !self.inner.update.values.is_empty()
+            || !self.inner.update.sensitive_values.is_empty();
 
-                conditon_values.extend(condition.sensitive_values);
+        let values = if needs_values {
+            let mut vals = HashMap::with_capacity(
+                cnd_values.len()
+                    + cnd_sensitive_values.len()
+                    + self.inner.update.values.len()
+                    + self.inner.update.sensitive_values.len(),
+            );
+            vals.extend(cnd_values);
+            vals.extend(self.inner.update.values);
 
-                values = values.map(|mut values| {
-                    values.extend(conditon_values);
-                    values
-                });
-            }
+            span.record(
+                "aws.dynamodb.expression_attribute_values",
+                field::debug(&vals),
+            );
 
-            query = query.set_condition_expression(Some(condition.expression));
-        }
+            vals.extend(cnd_sensitive_values);
+            vals.extend(self.inner.update.sensitive_values);
+
+            Some(vals)
+        } else {
+            None
+        };
 
         query = query
             .set_expression_attribute_names(names)
