@@ -1,6 +1,6 @@
 [package]
 name = "modyne"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Marcus Griep <marcus@griep.us>"]
 description = "High-level crate for interacting with single-table DynamoDB instances"
 readme = "./README.md"
@@ -32,7 +32,7 @@ async-trait = "0.1.66"
 aws-config = "0.56.1"
 aws-sdk-dynamodb = "0.30.0"
 fnv = "1.0.7"
-modyne-derive = { version = "=0.1.0", optional = true, path = "./modyne-derive" }
+modyne-derive = { version = "=0.2.0", optional = true, path = "./modyne-derive" }
 once_cell = { version = "1.17.2", optional = true }
 serde = { version = "1.0.158", features = ["derive"] }
 serde_dynamo = { version = "4.2.5", features = ["aws-sdk-dynamodb+0_30"] }
