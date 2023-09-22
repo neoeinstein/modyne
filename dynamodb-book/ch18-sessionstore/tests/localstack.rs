@@ -1,9 +1,10 @@
 use aws_sdk_dynamodb::types::TimeToLiveSpecification;
 use dynamodb_book_ch18_sessionstore::{App, Session, Username, UsernameRef};
 use modyne::{
+    expr,
     model::{BatchGet, BatchWrite},
     types::Expiry,
-    EntityExt, Table, TestTableExt,
+    EntityExt, ProjectionExt, Table, TestTableExt,
 };
 
 #[test_log::test(tokio::test)]
@@ -168,6 +169,32 @@ async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send +
 
         assert!(result.unprocessed_items.unwrap_or_default().is_empty());
     }
+
+    let uuid = uuid::Uuid::new_v4();
+    Session {
+        session_token: uuid,
+        username: Username::from("mtest"),
+        created_at: time::OffsetDateTime::now_utc(),
+        expires_at: time::OffsetDateTime::now_utc(),
+        ttl: Expiry::from(time::OffsetDateTime::now_utc()),
+    }
+    .put()
+    .execute(&app)
+    .await?;
+
+    let modyne_user = UsernameRef::from_static("modyne");
+    Session::update(uuid)
+        .expression(
+            expr::Update::new("SET #username = :username")
+                .name("#username", "username")
+                .value(":username", modyne_user),
+        )
+        .execute(&app)
+        .await?;
+
+    let result = Session::get(uuid).execute(&app).await?;
+    let session = Session::from_item(result.item.unwrap_or_default())?;
+    assert_eq!(session.username, modyne_user);
 
     Ok(())
 }
