@@ -381,5 +381,5 @@ impl Database {
 ## Minimum supported Rust version (MSRV)
 
 The minimum supported Rust version for this crate is 1.70.0. The MSRV can be
-reduced to 1.66.1 by enabling the `once_cell` feature to use that crate's lazy
+reduced to 1.67.0 by enabling the `once_cell` feature to use that crate's lazy
 initialization primitives if desired.
