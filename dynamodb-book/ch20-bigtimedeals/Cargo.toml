@@ -1,6 +1,6 @@
 [package]
 name = "dynamodb-book-ch20-bigtimedeals"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Marcus Griep <marcus@griep.us>"]
 description = "Models from The DynamoDB Book Big Time Deals example"
@@ -20,7 +20,7 @@ once_cell = ["dep:once_cell", "modyne/once_cell"]
 aliri_braid = "0.4.0"
 aws-sdk-dynamodb = "0.30.0"
 futures = "0.3.27"
-modyne = { version = "0.1.0", path = "../..", features = ["derive"] }
+modyne = { version = "0.2.0", path = "../..", features = ["derive"] }
 once_cell = { version = "1.17.2", optional = true }
 pin-project-lite = "0.2.9"
 serde = { version = "1.0.158", features = ["derive"] }
