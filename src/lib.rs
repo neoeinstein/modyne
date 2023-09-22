@@ -35,7 +35,7 @@ pub use modyne_derive::EntityDef;
 /// have the following attribute: `#[entity(MyEntity)]`
 #[cfg(feature = "derive")]
 pub use modyne_derive::Projection;
-use serde_dynamo::aws_sdk_dynamodb_0_28 as codec;
+use serde_dynamo::aws_sdk_dynamodb_0_30 as codec;
 
 pub use crate::error::Error;
 
