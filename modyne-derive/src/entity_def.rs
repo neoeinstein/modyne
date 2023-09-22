@@ -7,7 +7,10 @@ use crate::{
 
 pub fn generate(input: syn::DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let syn::Data::Struct(data) = &input.data else {
-        return Err(syn::Error::new_spanned(input, "EntityDef may only be defined on a struct"))
+        return Err(syn::Error::new_spanned(
+            input,
+            "EntityDef may only be defined on a struct",
+        ));
     };
 
     let cont_attrs = ContainerAttrs::from_ast(&input.attrs)?;

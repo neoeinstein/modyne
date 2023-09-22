@@ -574,7 +574,7 @@ impl Projection {
         })
     }
 
-    const RESERVED_WORDS: &[&'static str] = &[
+    const RESERVED_WORDS: &'static [&'static str] = &[
         "ABORT",
         "ABSOLUTE",
         "ACTION",
