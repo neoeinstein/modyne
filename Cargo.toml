@@ -29,13 +29,13 @@ once_cell = ["dep:once_cell"]
 [dependencies]
 aliri_braid = "0.4.0"
 async-trait = "0.1.66"
-aws-config = "0.55.3"
-aws-sdk-dynamodb = "0.28.0"
+aws-config = "0.56.1"
+aws-sdk-dynamodb = "0.30.0"
 fnv = "1.0.7"
 modyne-derive = { version = "=0.1.0", optional = true, path = "./modyne-derive" }
 once_cell = { version = "1.17.2", optional = true }
 serde = { version = "1.0.158", features = ["derive"] }
-serde_dynamo = { version = "4.2.3", features = ["aws-sdk-dynamodb+0_28"] }
+serde_dynamo = { version = "4.2.5", features = ["aws-sdk-dynamodb+0_30"] }
 thiserror = "1.0.38"
 time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
 tokio = { version = "1.0", features = ["sync"] }

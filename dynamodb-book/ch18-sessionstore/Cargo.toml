@@ -18,7 +18,7 @@ once_cell = ["modyne/once_cell"]
 
 [dependencies]
 aliri_braid = "0.4.0"
-aws-sdk-dynamodb = "0.28.0"
+aws-sdk-dynamodb = "0.30.0"
 modyne = { version = "0.1.0", path = "../..", features = ["derive"] }
 serde = { version = "1.0.158", features = ["derive"] }
 time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
@@ -27,8 +27,8 @@ tracing = "0.1.36"
 uuid = { version = "1.3.0", features = ["v4", "serde"] }
 
 [dev-dependencies]
-aws-config = "0.55.3"
-aws-credential-types = "0.55.3"
+aws-config = "0.56.1"
+aws-credential-types = "0.56.1"
 test-log = { version = "0.2.11", default-features = false, features = ["trace"] }
 tokio = { version = "1.0", features = ["macros"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
