@@ -109,6 +109,7 @@ impl GetOne {
 
         let span = tracing::info_span!(
             "DynamoDB.GetItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "GetItem",
             db.name = table.table_name(),
@@ -337,6 +338,7 @@ impl PutOne {
     async fn execute<T: Table>(self, table: &T) -> Result<PutItemOutput, SdkError<PutItemError>> {
         let span = tracing::info_span!(
             "DynamoDB.PutItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "PutItem",
             db.name = table.table_name(),
@@ -627,6 +629,7 @@ impl UpdateOne {
     ) -> Result<UpdateItemOutput, SdkError<UpdateItemError>> {
         let span = tracing::info_span!(
             "DynamoDB.UpdateItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "UpdateItem",
             db.name = table.table_name(),
@@ -947,6 +950,7 @@ impl DeleteOne {
     ) -> Result<DeleteItemOutput, SdkError<DeleteItemError>> {
         let span = tracing::info_span!(
             "DynamoDB.DeleteItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "DeleteItem",
             db.name = table.table_name(),
@@ -1268,6 +1272,7 @@ impl TransactGet {
     ) -> Result<TransactGetItemsOutput, SdkError<TransactGetItemsError>> {
         let span = tracing::info_span!(
             "DynamoDB.TransactGetItems",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "TransactGetItems",
             db.name = table.table_name(),
@@ -1357,6 +1362,7 @@ impl TransactWrite {
     ) -> Result<TransactWriteItemsOutput, SdkError<TransactWriteItemsError>> {
         let span = tracing::info_span!(
             "DynamoDB.TransactWriteItems",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "TransactWriteItems",
             db.name = table.table_name(),
@@ -1479,6 +1485,7 @@ impl BatchGet {
     ) -> Result<BatchGetItemOutput, SdkError<BatchGetItemError>> {
         let span = tracing::info_span!(
             "DynamoDB.BatchGetItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "BatchGetItem",
             db.name = table.table_name(),
@@ -1557,6 +1564,7 @@ impl BatchWrite {
     ) -> Result<BatchWriteItemOutput, SdkError<BatchWriteItemError>> {
         let span = tracing::info_span!(
             "DynamoDB.BatchWriteItem",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "BatchWriteItem",
             db.name = table.table_name(),
@@ -1782,6 +1790,7 @@ impl<K: keys::Key> Query<K> {
 
         let span = tracing::info_span!(
             "DynamoDB.Query",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "Query",
             db.name = table.table_name(),
@@ -2027,6 +2036,7 @@ impl<K: keys::Key> Scan<K> {
 
         let span = tracing::info_span!(
             "DynamoDB.Scan",
+            span.kind = "client",
             db.system = "dynamodb",
             db.operation = "Scan",
             db.name = table.table_name(),
