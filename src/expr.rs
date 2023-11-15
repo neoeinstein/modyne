@@ -178,7 +178,7 @@ where
     }
 
     pub(crate) fn names(&self) -> impl Iterator<Item = (&'static str, &'static str)> {
-        let names = if let Some(sk) = K::DEFINITION.range_key() {
+        let names = if let Some(sk) = self.sort_key.as_ref().and(K::DEFINITION.range_key()) {
             [
                 Some(("#key_PK", K::DEFINITION.hash_key())),
                 Some(("#key_SK", sk)),
@@ -1153,6 +1153,8 @@ impl Projection {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use super::*;
 
     #[test]
@@ -1194,5 +1196,61 @@ mod tests {
 
         assert_eq!(proj.expression, "alpha,#prj_000,beta,green");
         assert_eq!(proj.names, vec![("#prj_000".to_owned(), "void".to_owned())]);
+    }
+
+    #[test]
+    fn key_condition_expression_partition_only_doesnt_include_sort_key_variable() {
+        let condition: KeyCondition<keys::Primary> = KeyCondition::in_partition("orange");
+        let names: HashMap<_, _> = condition.names().collect();
+        let values: HashMap<_, _> = condition.values().collect();
+
+        let expected_names: HashMap<_, _> = [("#key_PK", "PK")].into_iter().collect();
+        let expected_values: HashMap<_, _> = [(":key_PK", AttributeValue::S("orange".into()))]
+            .into_iter()
+            .collect();
+
+        assert_eq!(names, expected_names);
+        assert_eq!(values, expected_values);
+    }
+
+    #[test]
+    fn key_condition_expression_specific_item() {
+        let condition: KeyCondition<keys::Primary> =
+            KeyCondition::in_partition("orange").specific_item("green");
+        let names: HashMap<_, _> = condition.names().collect();
+        let values: HashMap<_, _> = condition.values().collect();
+
+        let expected_names: HashMap<_, _> =
+            [("#key_PK", "PK"), ("#key_SK", "SK")].into_iter().collect();
+        let expected_values: HashMap<_, _> = [
+            (":key_PK", AttributeValue::S("orange".into())),
+            (":key_SK", AttributeValue::S("green".into())),
+        ]
+        .into_iter()
+        .collect();
+
+        assert_eq!(names, expected_names);
+        assert_eq!(values, expected_values);
+    }
+
+    #[test]
+    fn key_condition_expression_between() {
+        let condition: KeyCondition<keys::Primary> =
+            KeyCondition::in_partition("orange").between("aqua", "turquoise");
+        let names: HashMap<_, _> = condition.names().collect();
+        let values: HashMap<_, _> = condition.values().collect();
+
+        let expected_names: HashMap<_, _> =
+            [("#key_PK", "PK"), ("#key_SK", "SK")].into_iter().collect();
+        let expected_values: HashMap<_, _> = [
+            (":key_PK", AttributeValue::S("orange".into())),
+            (":key_SK_START", AttributeValue::S("aqua".into())),
+            (":key_SK_END", AttributeValue::S("turquoise".into())),
+        ]
+        .into_iter()
+        .collect();
+
+        assert_eq!(names, expected_names);
+        assert_eq!(values, expected_values);
     }
 }
