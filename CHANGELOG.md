@@ -4,6 +4,14 @@ The format of this changelog is based on [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
+## [0.2.1] - 2023-11-15
+
+- Fix: Correctly handle `KeyCondition`s that don't specify a sort key ([#9])
+- Fix: Correct the span kind assigned to client DynamoDB spans ([#10])
+
+[#9]: https://github.com/neoeinstein/modyne/pull/9
+[#10]: https://github.com/neoeinstein/modyne/pull/10
+
 ## [0.2.0] - 2023-09-22
 
 _Note_: Due to the updated MSRV of the `time` crate, Modyne has updated its MSRV to 1.67.0.
