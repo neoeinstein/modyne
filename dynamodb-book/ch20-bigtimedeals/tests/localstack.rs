@@ -11,7 +11,7 @@ use modyne::TestTableExt;
 async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     use futures::stream::TryStreamExt;
 
-    let config = aws_config::from_env()
+    let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
         .endpoint_url("http://localhost:4566")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",

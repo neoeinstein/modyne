@@ -11,7 +11,7 @@ use modyne::{
 #[ignore = "this test requires a local DynamoDB instance running on localhost:4566 and may be \
             slow"]
 async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let config = aws_config::from_env()
+    let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
         .endpoint_url("http://localhost:4566")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
@@ -32,7 +32,7 @@ async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send +
             TimeToLiveSpecification::builder()
                 .attribute_name("ttl")
                 .enabled(true)
-                .build(),
+                .build()?,
         )
         .send()
         .await?;
@@ -88,7 +88,7 @@ async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send +
 #[ignore = "this test requires a local DynamoDB instance running on localhost:4566 and may be \
             slow"]
 async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let config = aws_config::from_env()
+    let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
         .endpoint_url("http://localhost:4566")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
@@ -109,7 +109,7 @@ async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send +
             TimeToLiveSpecification::builder()
                 .attribute_name("ttl")
                 .enabled(true)
-                .build(),
+                .build()?,
         )
         .send()
         .await?;

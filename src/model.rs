@@ -173,6 +173,7 @@ impl GetTransact {
             )
             .table_name(table.table_name())
             .build()
+            .expect("key and table name are always provided")
     }
 }
 
@@ -435,7 +436,9 @@ impl PutTransact {
                 .set_expression_attribute_values(values)
         }
 
-        builder.build()
+        builder
+            .build()
+            .expect("item and table name are always provided")
     }
 }
 
@@ -783,7 +786,9 @@ impl UpdateTransact {
                 .set_expression_attribute_values(values)
         }
 
-        builder.build()
+        builder
+            .build()
+            .expect("key, update expression, and table name are always provided")
     }
 }
 
@@ -1048,7 +1053,9 @@ impl DeleteTransact {
                 .set_expression_attribute_values(values)
         }
 
-        builder.build()
+        builder
+            .build()
+            .expect("key and table name are always provided")
     }
 }
 
@@ -1123,6 +1130,7 @@ impl ConditionCheckTransact {
             )
             .set_table_name(Some(table.table_name().into()))
             .build()
+            .expect("key, condition expression, and table name are always provided")
     }
 }
 
@@ -1307,7 +1315,7 @@ impl TransactGet {
             .await;
 
         if let Ok(output) = &result {
-            let capacity = output.consumed_capacity().unwrap_or_default().iter().fold(
+            let capacity = output.consumed_capacity().iter().fold(
                 ConsumedCapacity::builder().build(),
                 |mut acc, next| {
                     acc.capacity_units = merge_values(acc.capacity_units, next.capacity_units);
@@ -1394,7 +1402,7 @@ impl TransactWrite {
             .await;
 
         if let Ok(output) = &result {
-            let capacity = output.consumed_capacity().unwrap_or_default().iter().fold(
+            let capacity = output.consumed_capacity().iter().fold(
                 ConsumedCapacity::builder().build(),
                 |mut acc, next| {
                     acc.capacity_units = merge_values(acc.capacity_units, next.capacity_units);
@@ -1428,14 +1436,16 @@ impl BatchWriteItem {
                 .put_request(
                     aws_sdk_dynamodb::types::PutRequest::builder()
                         .set_item(Some(op.item))
-                        .build(),
+                        .build()
+                        .expect("item is always provided"),
                 )
                 .build(),
             Self::DeleteItem(op) => aws_sdk_dynamodb::types::WriteRequest::builder()
                 .delete_request(
                     aws_sdk_dynamodb::types::DeleteRequest::builder()
                         .set_key(Some(op.key))
-                        .build(),
+                        .build()
+                        .expect("key is always provided"),
                 )
                 .build(),
         }
@@ -1502,9 +1512,12 @@ impl BatchGet {
             for item in self.operations {
                 kattr = kattr.keys(item.key);
             }
-            let tables = [(table.table_name().to_owned(), kattr.build())]
-                .into_iter()
-                .collect();
+            let tables = [(
+                table.table_name().to_owned(),
+                kattr.build().expect("keys is always provided"),
+            )]
+            .into_iter()
+            .collect();
             Some(tables)
         };
 
@@ -1518,7 +1531,7 @@ impl BatchGet {
             .await;
 
         if let Ok(output) = &result {
-            let capacity = output.consumed_capacity().unwrap_or_default().iter().fold(
+            let capacity = output.consumed_capacity().iter().fold(
                 ConsumedCapacity::builder().build(),
                 |mut acc, next| {
                     acc.capacity_units = merge_values(acc.capacity_units, next.capacity_units);
@@ -1598,7 +1611,7 @@ impl BatchWrite {
             .await;
 
         if let Ok(output) = &result {
-            let capacity = output.consumed_capacity().unwrap_or_default().iter().fold(
+            let capacity = output.consumed_capacity().iter().fold(
                 ConsumedCapacity::builder().build(),
                 |mut acc, next| {
                     acc.capacity_units = merge_values(acc.capacity_units, next.capacity_units);

@@ -35,7 +35,7 @@ pub use modyne_derive::EntityDef;
 /// have the following attribute: `#[entity(MyEntity)]`
 #[cfg(feature = "derive")]
 pub use modyne_derive::Projection;
-use serde_dynamo::aws_sdk_dynamodb_0_30 as codec;
+use serde_dynamo::aws_sdk_dynamodb_1 as codec;
 
 pub use crate::error::Error;
 
@@ -919,22 +919,26 @@ where
             let hash = aws_sdk_dynamodb::types::AttributeDefinition::builder()
                 .set_attribute_name(Some(definition.hash_key().into()))
                 .set_attribute_type(Some(aws_sdk_dynamodb::types::ScalarAttributeType::S))
-                .build();
+                .build()
+                .expect("attribute name and attribute type are always provided");
             let mut key_schema = vec![aws_sdk_dynamodb::types::KeySchemaElement::builder()
                 .set_attribute_name(Some(definition.hash_key().into()))
                 .set_key_type(Some(aws_sdk_dynamodb::types::KeyType::Hash))
-                .build()];
+                .build()
+                .expect("attribute name and key type are always provided")];
             builder = builder.attribute_definitions(hash);
             if let Some(range_key) = definition.range_key() {
                 let range = aws_sdk_dynamodb::types::AttributeDefinition::builder()
                     .set_attribute_name(Some(range_key.into()))
                     .set_attribute_type(Some(aws_sdk_dynamodb::types::ScalarAttributeType::S))
-                    .build();
+                    .build()
+                    .expect("attribute name and attribute type are always provided");
                 key_schema.push(
                     aws_sdk_dynamodb::types::KeySchemaElement::builder()
                         .set_attribute_name(Some(range_key.into()))
                         .set_key_type(Some(aws_sdk_dynamodb::types::KeyType::Range))
-                        .build(),
+                        .build()
+                        .expect("attribute name and key type are always provided"),
                 );
                 builder = builder.attribute_definitions(range)
             }
@@ -946,7 +950,8 @@ where
                         .build(),
                 ))
                 .set_key_schema(Some(key_schema))
-                .build();
+                .build()
+                .expect("index name and key schema are always provided");
             builder = builder.global_secondary_indexes(gsi);
         }
 
@@ -955,22 +960,26 @@ where
         let hash = aws_sdk_dynamodb::types::AttributeDefinition::builder()
             .set_attribute_name(Some(primary_key_definition.hash_key.into()))
             .set_attribute_type(Some(aws_sdk_dynamodb::types::ScalarAttributeType::S))
-            .build();
+            .build()
+            .expect("attribute name and attribute type are always provided");
         let mut key_schema = vec![aws_sdk_dynamodb::types::KeySchemaElement::builder()
             .set_attribute_name(Some(primary_key_definition.hash_key.into()))
             .set_key_type(Some(aws_sdk_dynamodb::types::KeyType::Hash))
-            .build()];
+            .build()
+            .expect("attribute name and key type are always provided")];
         builder = builder.attribute_definitions(hash);
         if let Some(range_key) = primary_key_definition.range_key {
             let range = aws_sdk_dynamodb::types::AttributeDefinition::builder()
                 .set_attribute_name(Some(range_key.into()))
                 .set_attribute_type(Some(aws_sdk_dynamodb::types::ScalarAttributeType::S))
-                .build();
+                .build()
+                .expect("attribute name and attribute type are always provided");
             key_schema.push(
                 aws_sdk_dynamodb::types::KeySchemaElement::builder()
                     .set_attribute_name(Some(range_key.into()))
                     .set_key_type(Some(aws_sdk_dynamodb::types::KeyType::Range))
-                    .build(),
+                    .build()
+                    .expect("attribute name and key type are always provided"),
             );
             builder = builder.attribute_definitions(range)
         }
