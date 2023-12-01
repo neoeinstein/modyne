@@ -82,7 +82,7 @@ respectively.
 
 ---
 
-†: The MSRV for this crate can be lowered to 1.67.0 by enabling the
+†: The MSRV for this crate can be lowered to 1.68.0 by enabling the
 `once_cell` feature.
 
 [cratesio]: https://crates.io/crates/modyne
