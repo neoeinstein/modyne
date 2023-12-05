@@ -52,37 +52,9 @@ single-table design.
 For a more complete tour of the functionality in this crate, see the
 [documentation on docs.rs][docsrs].
 
-## Usage notes
-
-While _modyne_ is available and ready for general use, you should be aware of a
-few usage notes before you commit to this crate.
-
-### Undocumented field usage
-
-This library relies on the undocumented ability to directly access the `item`
-field on response objects returned by the DynamoDB API. It does this because the
-deserializer in `serde_dynamo` requires ownership of the items map. Without
-directly accessing the field, every attempt to deserialize would require cloning
-the entire items map every time, which would be undesirable and cause
-significant performance overhead. In the event that this field becomes
-unavailable, we may need to fall back to this less-performant mechanism.
-
-### Binding to latest AWS SDK
-
-As of now, this library will only bind itself to the latest version of the AWS
-DynamoDB SDK. This may be updated in the future to use feature flags to allow
-targeting multiple different SDK versions, but as this crate gets going we will
-only target a single version of the AWS SDK, most often the latest version.
-
-An update to the AWS SDK that does not break _modyne_'s usage of the AWS SDK
-will only result in a minor version bump. If the AWS SDK exposes an observable
-breaking change to _modyne_, then a major version bump will be used. Prior to
-1.0, those bumps will be to the patch and minor version components,
-respectively.
-
 ---
 
-†: The MSRV for this crate can be lowered to 1.67.0 by enabling the
+†: The MSRV for this crate can be lowered to 1.68.0 by enabling the
 `once_cell` feature.
 
 [cratesio]: https://crates.io/crates/modyne
