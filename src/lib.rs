@@ -37,9 +37,7 @@ pub use modyne_derive::EntityDef;
 pub use modyne_derive::Projection;
 use serde_dynamo::aws_sdk_dynamodb_1 as codec;
 
-pub use crate::error::Error;
-
-const ENTITY_TYPE_ATTRIBUTE: &str = "entity_type";
+pub use crate::error::{Error, MissingEntityTypeError};
 
 /// An alias for a DynamoDB item
 pub type Item = HashMap<String, AttributeValue>;
@@ -50,6 +48,9 @@ pub struct EntityTypeName;
 
 /// A description of a DynamoDB table
 pub trait Table {
+    /// The attribute name used for storing the entity type
+    const ENTITY_TYPE_ATTRIBUTE: &'static str = "entity_type";
+
     /// The primary key to be used for the table
     type PrimaryKey: keys::PrimaryKey;
 
@@ -61,6 +62,29 @@ pub trait Table {
 
     /// Returns a reference to the DynamoDB client used by this table
     fn client(&self) -> &aws_sdk_dynamodb::Client;
+
+    /// Extracts the entity type from an item
+    ///
+    /// In general, this item should not need to be overriden, but an override
+    /// may be used in non-standard use cases, or for compatibility with
+    /// existing systems.
+    fn get_entity_type(item: &Item) -> Option<&EntityTypeNameRef> {
+        let attr = item.get(Self::ENTITY_TYPE_ATTRIBUTE)?;
+        let value = attr.as_s().ok()?;
+        Some(EntityTypeNameRef::from_str(value.as_str()))
+    }
+
+    /// Embeds the entity type in an item
+    ///
+    /// In general, this item should not need to be overriden, but an override
+    /// may be used in non-standard use cases, or for compatibility with
+    /// existing systems.
+    fn set_entity_type(item: &mut Item, entity_type: &EntityTypeNameRef) {
+        item.insert(
+            Self::ENTITY_TYPE_ATTRIBUTE.to_owned(),
+            AttributeValue::S(entity_type.to_string()),
+        );
+    }
 }
 
 /// The name and attribute definition for an [`Entity`]
@@ -459,21 +483,33 @@ pub trait ProjectionSet: Sized {
 /// See the [module-level documentation][crate] for more details.
 #[macro_export]
 macro_rules! projections {
-    ($(#[$meta:meta])* $v:vis enum $name:ident { $($ty:ident),* $(,)? }) => {
+    ($(#[$meta:meta])* $v:vis enum $name:ident { $ty:ident }) => {
+        $crate::projections!{
+            ($(#[$meta])* $v:vis enum $name { $ty, })
+        }
+    };
+    ($(#[$meta:meta])* $v:vis enum $name:ident { $ty:ident, $($tys:ident),* $(,)? }) => {
         $(#[$meta])*
         $v enum $name {
-            $($ty($ty),)*
+            $ty($ty),
+            $($tys($tys),)*
         }
 
         impl $crate::ProjectionSet for $name {
             fn try_from_item(item: $crate::Item) -> ::std::result::Result<::std::option::Option<Self>, $crate::Error> {
-                let entity_type = $crate::__private::get_entity_type(&item)?;
+                let entity_type = <<<$ty as $crate::Projection>::Entity as $crate::Entity>::Table as $crate::Table>::get_entity_type(&item)
+                    .ok_or($crate::MissingEntityTypeError::default())?;
 
                 let parsed =
+                if entity_type == <<$ty as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
+                    let parsed = <$ty as $crate::ProjectionExt>::from_item(item)
+                        .map(Self::$ty)?;
+                    ::std::option::Option::Some(parsed)
+                } else
                 $(
-                    if entity_type == <<$ty as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
-                        let parsed = <$ty as $crate::ProjectionExt>::from_item(item)
-                            .map(Self::$ty)?;
+                    if entity_type == <<$tys as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
+                        let parsed = <$tys as $crate::ProjectionExt>::from_item(item)
+                            .map(Self::$tys)?;
                         ::std::option::Option::Some(parsed)
                     } else
                 )*
@@ -486,9 +522,31 @@ macro_rules! projections {
             }
 
             fn projection_expression() -> ::std::option::Option<$crate::expr::StaticProjection> {
-                $crate::once_projection_expression!($($ty),*)
+                $crate::once_projection_expression!($ty,$($tys),*)
             }
         }
+
+        /// Ensures that the table types will match for all variants in a projection set
+        const _: fn() = || { $({
+            trait TypeEq {
+                type This: ?Sized;
+            }
+
+            impl<T: ?Sized> TypeEq for T {
+                type This = Self;
+            }
+
+            fn assert_table_types_match_for_all_variants<T, U>()
+            where
+                T: ?Sized + TypeEq<This = U>,
+                U: ?Sized,
+            {}
+
+            assert_table_types_match_for_all_variants::<
+                <<$ty as $crate::Projection>::Entity as $crate::Entity>::Table,
+                <<$tys as $crate::Projection>::Entity as $crate::Entity>::Table,
+            >();
+        })* };
     };
 }
 
@@ -534,10 +592,35 @@ macro_rules! projections {
 /// ```
 #[macro_export]
 macro_rules! once_projection_expression {
-    ($($ty:path),* $(,)?) => {{
+    ($ty:path) => { $crate::once_projection_expression!($ty,) };
+    ($ty:path, $($tys:path),* $(,)?) => {{
+
+        /// Ensures that the table types will match for all variants in a projection set
+        const _: fn() = || { $({
+            trait TypeEq {
+                type This: ?Sized;
+            }
+
+            impl<T: ?Sized> TypeEq for T {
+                type This = Self;
+            }
+
+            fn assert_table_types_match_for_all_variants<T, U>()
+            where
+                T: ?Sized + TypeEq<This = U>,
+                U: ?Sized,
+            {}
+
+            assert_table_types_match_for_all_variants::<
+                <<$ty as $crate::Projection>::Entity as $crate::Entity>::Table,
+                <<$tys as $crate::Projection>::Entity as $crate::Entity>::Table,
+            >();
+        })* };
+
         const PROJECTIONS: &'static [&'static [&'static str]] = &[
+            <$ty as $crate::Projection>::PROJECTED_ATTRIBUTES,
             $(
-                <$ty as $crate::Projection>::PROJECTED_ATTRIBUTES,
+                <$tys as $crate::Projection>::PROJECTED_ATTRIBUTES,
             )*
         ];
 
@@ -546,7 +629,9 @@ macro_rules! once_projection_expression {
         > = $crate::__private::OnceLock::new();
 
         *PROJECTION_ONCE.get_or_init(|| {
-            $crate::__private::generate_projection_expression(PROJECTIONS)
+            $crate::__private::generate_projection_expression::<<<$ty as $crate::Projection>::Entity as $crate::Entity>::Table>(
+                PROJECTIONS,
+            )
         })
     }};
 }
@@ -604,9 +689,8 @@ where
     P: Projection + serde::Deserialize<'a> + 'static,
 {
     fn try_from_item(item: Item) -> Result<Option<Self>, Error> {
-        match item.get(ENTITY_TYPE_ATTRIBUTE) {
-            Some(AttributeValue::S(entity_type)) => {
-                let entity_type = EntityTypeNameRef::from_str(entity_type);
+        match <<P::Entity as crate::Entity>::Table as crate::Table>::get_entity_type(&item) {
+            Some(entity_type) => {
                 if entity_type == <P::Entity as EntityDef>::ENTITY_TYPE {
                     let parsed = P::from_item(item)?;
                     Ok(Some(parsed))
@@ -615,7 +699,7 @@ where
                     Ok(None)
                 }
             }
-            _ => Err(crate::error::MissingEntityTypeError {}.into()),
+            None => Err(crate::error::MissingEntityTypeError::default().into()),
         }
     }
 
@@ -644,12 +728,10 @@ where
                 return None;
             }
 
-            let projection = expr::Projection::new(
-                P::PROJECTED_ATTRIBUTES
-                    .iter()
-                    .copied()
-                    .chain([ENTITY_TYPE_ATTRIBUTE]),
-            );
+            let projection =
+                expr::Projection::new(P::PROJECTED_ATTRIBUTES.iter().copied().chain([
+                    <<P::Entity as crate::Entity>::Table as crate::Table>::ENTITY_TYPE_ATTRIBUTE,
+                ]));
 
             // Leak the generated projection expression. This is safe since we're the
             // only ones with a lock that allows generating an expression. Thus no unnecessary
@@ -846,19 +928,8 @@ pub mod __private {
     #[cfg(feature = "once_cell")]
     pub type OnceLock<T> = once_cell::sync::OnceCell<T>;
 
-    #[inline]
-    pub fn get_entity_type(item: &crate::Item) -> Result<&crate::EntityTypeNameRef, crate::Error> {
-        let entity_type = item
-            .get(crate::ENTITY_TYPE_ATTRIBUTE)
-            .ok_or(crate::error::MissingEntityTypeError {})?
-            .as_s()
-            .map_err(|_| crate::error::MissingEntityTypeError {})?
-            .as_str();
-        Ok(crate::EntityTypeNameRef::from_str(entity_type))
-    }
-
     /// Generate a projection expression for the given entity types
-    pub fn generate_projection_expression(
+    pub fn generate_projection_expression<T: crate::Table>(
         attributes: &[&[&str]],
     ) -> Option<crate::expr::StaticProjection> {
         if !attributes.iter().all(|attrs| !attrs.is_empty()) {
@@ -871,7 +942,7 @@ pub mod __private {
                 .copied()
                 .flatten()
                 .copied()
-                .chain([crate::ENTITY_TYPE_ATTRIBUTE]),
+                .chain([T::ENTITY_TYPE_ATTRIBUTE]),
         );
         Some(expr.leak())
     }

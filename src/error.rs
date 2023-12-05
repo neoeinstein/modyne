@@ -161,6 +161,9 @@ impl ItemDeserializationError {
     }
 }
 
-#[derive(Debug, thiserror::Error)]
-#[error("entity type is missing from item or is not a string")]
-pub(crate) struct MissingEntityTypeError {}
+/// An error indicating that the entity type is missing from a DynamoDB
+/// item, or could not be successfull extracted from the item
+#[derive(Debug, Default, thiserror::Error)]
+#[non_exhaustive]
+#[error("entity type is missing from item or could not be extracted")]
+pub struct MissingEntityTypeError {}
