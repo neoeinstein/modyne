@@ -68,10 +68,14 @@ pub trait Table {
     /// In general, this item should not need to be overriden, but an override
     /// may be used in non-standard use cases, or for compatibility with
     /// existing systems.
-    fn get_entity_type(item: &Item) -> Option<&EntityTypeNameRef> {
-        let attr = item.get(Self::ENTITY_TYPE_ATTRIBUTE)?;
-        let value = attr.as_s().ok()?;
-        Some(EntityTypeNameRef::from_str(value.as_str()))
+    fn get_entity_type(item: &Item) -> Result<&EntityTypeNameRef, MissingEntityTypeError> {
+        let attr = item
+            .get(Self::ENTITY_TYPE_ATTRIBUTE)
+            .ok_or(MissingEntityTypeError::AttributeNotFound)?;
+        let value = attr
+            .as_s()
+            .map_err(|_| MissingEntityTypeError::MalformedAttributeValue(None))?;
+        Ok(EntityTypeNameRef::from_str(value.as_str()))
     }
 
     /// Embeds the entity type in an item
@@ -497,8 +501,7 @@ macro_rules! projections {
 
         impl $crate::ProjectionSet for $name {
             fn try_from_item(item: $crate::Item) -> ::std::result::Result<::std::option::Option<Self>, $crate::Error> {
-                let entity_type = <<<$ty as $crate::Projection>::Entity as $crate::Entity>::Table as $crate::Table>::get_entity_type(&item)
-                    .ok_or($crate::MissingEntityTypeError::default())?;
+                let entity_type = <<<$ty as $crate::Projection>::Entity as $crate::Entity>::Table as $crate::Table>::get_entity_type(&item)?;
 
                 let parsed =
                 if entity_type == <<$ty as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
@@ -689,17 +692,14 @@ where
     P: Projection + serde::Deserialize<'a> + 'static,
 {
     fn try_from_item(item: Item) -> Result<Option<Self>, Error> {
-        match <<P::Entity as crate::Entity>::Table as crate::Table>::get_entity_type(&item) {
-            Some(entity_type) => {
-                if entity_type == <P::Entity as EntityDef>::ENTITY_TYPE {
-                    let parsed = P::from_item(item)?;
-                    Ok(Some(parsed))
-                } else {
-                    tracing::warn!(entity_type = entity_type.as_str(), "unknown entity type");
-                    Ok(None)
-                }
-            }
-            None => Err(crate::error::MissingEntityTypeError::default().into()),
+        let entity_type =
+            <<P::Entity as crate::Entity>::Table as crate::Table>::get_entity_type(&item)?;
+        if entity_type == <P::Entity as EntityDef>::ENTITY_TYPE {
+            let parsed = P::from_item(item)?;
+            Ok(Some(parsed))
+        } else {
+            tracing::warn!(entity_type = entity_type.as_str(), "unknown entity type");
+            Ok(None)
         }
     }
 

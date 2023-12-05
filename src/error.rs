@@ -161,9 +161,15 @@ impl ItemDeserializationError {
     }
 }
 
-/// An error indicating that the entity type is missing from a DynamoDB
-/// item, or could not be successfull extracted from the item
-#[derive(Debug, Default, thiserror::Error)]
+/// An error retrieving the entity type for a DynamoDB item
+#[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
-#[error("entity type is missing from item or could not be extracted")]
-pub struct MissingEntityTypeError {}
+pub enum MissingEntityTypeError {
+    /// The entity type attribute was not found on the item
+    #[error("entity type attribute is missing from the item")]
+    AttributeNotFound,
+
+    /// The entity type attribute was found, but was malformed and could not be extracted
+    #[error("entity type attribute value is malformed and could not be extracted from the item")]
+    MalformedAttributeValue(#[source] Option<Box<dyn std::error::Error + Send + Sync>>),
+}
