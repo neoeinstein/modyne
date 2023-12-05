@@ -529,27 +529,7 @@ macro_rules! projections {
             }
         }
 
-        /// Ensures that the table types will match for all variants in a projection set
-        const _: fn() = || { $({
-            trait TypeEq {
-                type This: ?Sized;
-            }
-
-            impl<T: ?Sized> TypeEq for T {
-                type This = Self;
-            }
-
-            fn assert_table_types_match_for_all_variants<T, U>()
-            where
-                T: ?Sized + TypeEq<This = U>,
-                U: ?Sized,
-            {}
-
-            assert_table_types_match_for_all_variants::<
-                <<$ty as $crate::Projection>::Entity as $crate::Entity>::Table,
-                <<$tys as $crate::Projection>::Entity as $crate::Entity>::Table,
-            >();
-        })* };
+        // Verifies that the Table types are all equal via the `once_projection_expression!` macro
     };
 }
 
@@ -597,28 +577,7 @@ macro_rules! projections {
 macro_rules! once_projection_expression {
     ($ty:path) => { $crate::once_projection_expression!($ty,) };
     ($ty:path, $($tys:path),* $(,)?) => {{
-
-        /// Ensures that the table types will match for all variants in a projection set
-        const _: fn() = || { $({
-            trait TypeEq {
-                type This: ?Sized;
-            }
-
-            impl<T: ?Sized> TypeEq for T {
-                type This = Self;
-            }
-
-            fn assert_table_types_match_for_all_variants<T, U>()
-            where
-                T: ?Sized + TypeEq<This = U>,
-                U: ?Sized,
-            {}
-
-            assert_table_types_match_for_all_variants::<
-                <<$ty as $crate::Projection>::Entity as $crate::Entity>::Table,
-                <<$tys as $crate::Projection>::Entity as $crate::Entity>::Table,
-            >();
-        })* };
+        $crate::ensure_table_types_are_same!($ty, $($tys),*);
 
         const PROJECTIONS: &'static [&'static [&'static str]] = &[
             <$ty as $crate::Projection>::PROJECTED_ATTRIBUTES,
@@ -657,6 +616,35 @@ macro_rules! read_projection {
             Err(error) => Err(error),
         }
     }};
+}
+
+/// Ensures that the table types will match for all variants in a projection set
+#[macro_export]
+#[doc(hidden)]
+macro_rules! ensure_table_types_are_same {
+    ($ty:path) => {};
+    ($ty:path, $($tys:path),* $(,)?) => {
+        const _: fn() = || { $({
+            trait TypeEq {
+                type This: ?Sized;
+            }
+
+            impl<T: ?Sized> TypeEq for T {
+                type This = Self;
+            }
+
+            fn assert_table_types_match_for_all_projection_variants<T, U>()
+            where
+                T: ?Sized + TypeEq<This = U>,
+                U: ?Sized,
+            {}
+
+            assert_table_types_match_for_all_projection_variants::<
+                <<$ty as $crate::Projection>::Entity as $crate::Entity>::Table,
+                <<$tys as $crate::Projection>::Entity as $crate::Entity>::Table,
+            >();
+        })* };
+    };
 }
 
 /// An aggregate of multiple entity types, often used when querying multiple
