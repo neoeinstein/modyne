@@ -372,13 +372,102 @@ impl Database {
 }
 ```
 
-## Features
+## Non-standard tables
+
+Modyne is generally opinionated about how to manage entities in a single-table
+design. However, certain users may want to manage that information in a slightly
+different way for interoperability with already existing ecosystems migrating
+into Modyne. For these cases, the `Table` trait has a few items that can be
+overriden.
+
+### Using a non-standard entity type attribute name
+
+If the attribute that holds the entity type name is not `entity_type`, then you
+can specify the appropriate attribute name by overriding the
+[`ENTITY_TYPE_ATTRIBUTE`][Table::ENTITY_TYPE_ATTRIBUTE] constant.
+
+```
+use modyne::{keys, Table};
+
+# struct Database {
+#     table_name: String,
+#     client: aws_sdk_dynamodb::Client,
+# }
+#
+impl Table for Database {
+    const ENTITY_TYPE_ATTRIBUTE: &'static str = "et";
+
+    type PrimaryKey = keys::Primary;
+    type IndexKeys = keys::Gsi1;
+
+    fn table_name(&self) -> &str {
+        &self.table_name
+    }
+
+    fn client(&self) -> &aws_sdk_dynamodb::Client {
+        &self.client
+    }
+}
+```
+
+This table will now store and retreive the entity type name from the `et`
+attribute on an item, which it will expect to be a DynamoDB string value.
+
+### Using a non-standard entity type attribute value
+
+If the attribute that holds the entity type name does not use a DynamoDB string
+value, then you can override the behavior for embedding and extracting the
+entity type name by overriding the serialization functions for the table.
+
+```
+use modyne::{keys, AttributeValue, EntityTypeNameRef, MalformedEntityTypeError, Table};
+
+# struct Database {
+#     table_name: String,
+#     client: aws_sdk_dynamodb::Client,
+# }
+#
+impl Table for Database {
+    type PrimaryKey = keys::Primary;
+    type IndexKeys = keys::Gsi1;
+
+    fn table_name(&self) -> &str {
+        &self.table_name
+    }
+
+    fn client(&self) -> &aws_sdk_dynamodb::Client {
+        &self.client
+    }
+
+    fn deserialize_entity_type(
+        attr: &AttributeValue,
+    ) -> Result<&EntityTypeNameRef, MalformedEntityTypeError> {
+        let values = attr
+            .as_ss()
+            .map_err(|_| MalformedEntityTypeError::Custom("expected a string set".into()))?;
+        let value = values
+            .first()
+            .expect("a DynamoDB string set always has at least one element");
+        Ok(EntityTypeNameRef::from_str(value.as_str()))
+    }
+
+    fn serialize_entity_type(entity_type: &EntityTypeNameRef) -> AttributeValue {
+        AttributeValue::Ss(vec![entity_type.to_string()])
+    }
+}
+```
+
+The above example uses the standard `entity_type` attribute, but stores and
+retrieves the name as a single-element string set. You can combine both of these
+overrides to use a non-standard value codec with a non-standard attribute name.
+
+# Features
 
 - `derive`: Re-exports the derive macros provided by the `modyne-derive` crate.
 - `once_cell`: Uses the lazy initialization primitives provided by the
   `once_cell` crate.
 
-## Minimum supported Rust version (MSRV)
+# Minimum supported Rust version (MSRV)
 
 The minimum supported Rust version for this crate is 1.70.0. The MSRV can be
 reduced to 1.68.0 by enabling the `once_cell` feature to use that crate's lazy
