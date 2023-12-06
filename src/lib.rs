@@ -69,12 +69,14 @@ pub trait Table {
     /// In general, this function should not need to be overriden, but an override
     /// may be used in non-standard use cases, or for compatibility with
     /// existing systems.
+    #[inline]
     fn deserialize_entity_type(
         attr: &AttributeValue,
     ) -> Result<&EntityTypeNameRef, MalformedEntityTypeError> {
-        let value = attr
-            .as_s()
-            .map_err(|_| MalformedEntityTypeError::ExpectedStringValue)?;
+        let Ok(value) = attr.as_s() else {
+            return Err(MalformedEntityTypeError::ExpectedStringValue);
+        };
+
         Ok(EntityTypeNameRef::from_str(value.as_str()))
     }
 
@@ -83,6 +85,7 @@ pub trait Table {
     /// In general, this function should not need to be overriden, but an override
     /// may be used in non-standard use cases, or for compatibility with
     /// existing systems.
+    #[inline]
     fn serialize_entity_type(entity_type: &EntityTypeNameRef) -> AttributeValue {
         AttributeValue::S(entity_type.to_string())
     }
