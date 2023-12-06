@@ -11,7 +11,8 @@ pub mod types;
 
 use std::collections::HashMap;
 
-use aws_sdk_dynamodb::types::AttributeValue;
+#[doc(inline)]
+pub use aws_sdk_dynamodb::types::AttributeValue;
 use keys::{IndexKeys, PrimaryKey};
 use model::{ConditionCheck, ConditionalPut, Delete, Get, Put, Query, Scan, Update};
 /// Derive macro for the [`trait@EntityDef`] trait
@@ -37,7 +38,7 @@ pub use modyne_derive::EntityDef;
 pub use modyne_derive::Projection;
 use serde_dynamo::aws_sdk_dynamodb_1 as codec;
 
-pub use crate::error::{Error, MissingEntityTypeError};
+pub use crate::error::{Error, MalformedEntityTypeError};
 
 /// An alias for a DynamoDB item
 pub type Item = HashMap<String, AttributeValue>;
@@ -63,31 +64,27 @@ pub trait Table {
     /// Returns a reference to the DynamoDB client used by this table
     fn client(&self) -> &aws_sdk_dynamodb::Client;
 
-    /// Extracts the entity type from an item
+    /// Deserializes the entity type from an attribute value
     ///
-    /// In general, this item should not need to be overriden, but an override
+    /// In general, this function should not need to be overriden, but an override
     /// may be used in non-standard use cases, or for compatibility with
     /// existing systems.
-    fn get_entity_type(item: &Item) -> Result<&EntityTypeNameRef, MissingEntityTypeError> {
-        let attr = item
-            .get(Self::ENTITY_TYPE_ATTRIBUTE)
-            .ok_or(MissingEntityTypeError::AttributeNotFound)?;
+    fn deserialize_entity_type(
+        attr: &AttributeValue,
+    ) -> Result<&EntityTypeNameRef, MalformedEntityTypeError> {
         let value = attr
             .as_s()
-            .map_err(|_| MissingEntityTypeError::MalformedAttributeValue(None))?;
+            .map_err(|_| MalformedEntityTypeError::ExpectedStringValue)?;
         Ok(EntityTypeNameRef::from_str(value.as_str()))
     }
 
-    /// Embeds the entity type in an item
+    /// Serializes the entity type as an attribute value
     ///
-    /// In general, this item should not need to be overriden, but an override
+    /// In general, this function should not need to be overriden, but an override
     /// may be used in non-standard use cases, or for compatibility with
     /// existing systems.
-    fn set_entity_type(item: &mut Item, entity_type: &EntityTypeNameRef) {
-        item.insert(
-            Self::ENTITY_TYPE_ATTRIBUTE.to_owned(),
-            AttributeValue::S(entity_type.to_string()),
-        );
+    fn serialize_entity_type(entity_type: &EntityTypeNameRef) -> AttributeValue {
+        AttributeValue::S(entity_type.to_string())
     }
 }
 
@@ -320,12 +317,24 @@ pub trait EntityExt: Entity {
         Self: serde::Serialize,
     {
         let full_entity = FullEntity {
-            entity_type: Self::ENTITY_TYPE,
             keys: self.full_key(),
             entity: self,
         };
 
-        crate::codec::to_item(full_entity).unwrap()
+        let mut item = crate::codec::to_item(full_entity).unwrap();
+        if item
+            .insert(
+                <Self::Table as Table>::ENTITY_TYPE_ATTRIBUTE.to_string(),
+                <Self::Table as Table>::serialize_entity_type(Self::ENTITY_TYPE),
+            )
+            .is_some()
+        {
+            tracing::warn!(
+                "serialized entity had attribute collision with entity type attribute `{}`",
+                <Self::Table as Table>::ENTITY_TYPE_ATTRIBUTE,
+            );
+        }
+        item
     }
 
     /// Prepares a get operation for the entity
@@ -501,7 +510,7 @@ macro_rules! projections {
 
         impl $crate::ProjectionSet for $name {
             fn try_from_item(item: $crate::Item) -> ::std::result::Result<::std::option::Option<Self>, $crate::Error> {
-                let entity_type = <<<$ty as $crate::Projection>::Entity as $crate::Entity>::Table as $crate::Table>::get_entity_type(&item)?;
+                let entity_type = $crate::__private::get_entity_type::<$ty>(&item)?;
 
                 let parsed =
                 if entity_type == <<$ty as $crate::Projection>::Entity as $crate::EntityDef>::ENTITY_TYPE {
@@ -680,8 +689,7 @@ where
     P: Projection + serde::Deserialize<'a> + 'static,
 {
     fn try_from_item(item: Item) -> Result<Option<Self>, Error> {
-        let entity_type =
-            <<P::Entity as crate::Entity>::Table as crate::Table>::get_entity_type(&item)?;
+        let entity_type = crate::__private::get_entity_type::<Self>(&item)?;
         if entity_type == <P::Entity as EntityDef>::ENTITY_TYPE {
             let parsed = P::from_item(item)?;
             Ok(Some(parsed))
@@ -899,8 +907,6 @@ where
 
 #[derive(serde::Serialize)]
 struct FullEntity<T: Entity> {
-    entity_type: &'static EntityTypeNameRef,
-
     #[serde(flatten)]
     keys: keys::FullKey<<T::Table as Table>::PrimaryKey, T::IndexKeys>,
 
@@ -915,6 +921,19 @@ pub mod __private {
 
     #[cfg(feature = "once_cell")]
     pub type OnceLock<T> = once_cell::sync::OnceCell<T>;
+
+    pub fn get_entity_type<P: crate::Projection>(
+        item: &crate::Item,
+    ) -> Result<&crate::EntityTypeNameRef, crate::Error> {
+        let entity_type_attr = item
+            .get(<<P::Entity as crate::Entity>::Table as crate::Table>::ENTITY_TYPE_ATTRIBUTE)
+            .ok_or(crate::error::MissingEntityTypeError {})?;
+        let entity_type =
+            <<P::Entity as crate::Entity>::Table as crate::Table>::deserialize_entity_type(
+                entity_type_attr,
+            )?;
+        Ok(entity_type)
+    }
 
     /// Generate a projection expression for the given entity types
     pub fn generate_projection_expression<T: crate::Table>(
@@ -1061,71 +1080,297 @@ where
 mod tests {
     use super::*;
 
-    struct TestTable;
-    impl Table for TestTable {
-        type PrimaryKey = keys::Primary;
-        type IndexKeys = keys::Gsi13;
+    mod standard {
+        use super::*;
 
-        fn client(&self) -> &aws_sdk_dynamodb::Client {
-            unimplemented!()
-        }
+        struct TestTable;
+        impl Table for TestTable {
+            type PrimaryKey = keys::Primary;
+            type IndexKeys = keys::Gsi13;
 
-        fn table_name(&self) -> &str {
-            unimplemented!()
-        }
-    }
+            fn client(&self) -> &aws_sdk_dynamodb::Client {
+                unimplemented!()
+            }
 
-    #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-    struct TestEntity {
-        id: String,
-        name: String,
-        email: String,
-    }
-
-    impl EntityDef for TestEntity {
-        const ENTITY_TYPE: &'static EntityTypeNameRef = EntityTypeNameRef::from_static("test_ent");
-    }
-
-    impl Entity for TestEntity {
-        type KeyInput<'a> = (&'a str, &'a str);
-        type Table = TestTable;
-        type IndexKeys = keys::Gsi13;
-
-        fn primary_key((id, email): Self::KeyInput<'_>) -> keys::Primary {
-            keys::Primary {
-                hash: format!("PK#{id}"),
-                range: format!("NAME#{email}"),
+            fn table_name(&self) -> &str {
+                unimplemented!()
             }
         }
 
-        fn full_key(&self) -> keys::FullKey<keys::Primary, Self::IndexKeys> {
-            keys::FullKey {
-                primary: Self::primary_key((&self.id, &self.email)),
-                indexes: keys::Gsi13 {
-                    hash: format!("GSI13#{}", self.id),
-                    range: format!("GSI13#NAME#{}", self.name),
-                },
+        #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+        struct TestEntity {
+            id: String,
+            name: String,
+            email: String,
+        }
+
+        impl EntityDef for TestEntity {
+            const ENTITY_TYPE: &'static EntityTypeNameRef =
+                EntityTypeNameRef::from_static("test_ent");
+        }
+
+        impl Entity for TestEntity {
+            type KeyInput<'a> = (&'a str, &'a str);
+            type Table = TestTable;
+            type IndexKeys = keys::Gsi13;
+
+            fn primary_key((id, email): Self::KeyInput<'_>) -> keys::Primary {
+                keys::Primary {
+                    hash: format!("PK#{id}"),
+                    range: format!("NAME#{email}"),
+                }
             }
+
+            fn full_key(&self) -> keys::FullKey<keys::Primary, Self::IndexKeys> {
+                keys::FullKey {
+                    primary: Self::primary_key((&self.id, &self.email)),
+                    indexes: keys::Gsi13 {
+                        hash: format!("GSI13#{}", self.id),
+                        range: format!("GSI13#NAME#{}", self.name),
+                    },
+                }
+            }
+        }
+
+        #[test]
+        fn test_entity_serializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.into_item();
+            assert_eq!(item.len(), 8);
+            assert_eq!(item["entity_type"].as_s().unwrap(), "test_ent");
+            assert_eq!(item["PK"].as_s().unwrap(), "PK#test1");
+            assert_eq!(item["SK"].as_s().unwrap(), "NAME#my_email@not_real.com");
+            assert_eq!(item["GSI13PK"].as_s().unwrap(), "GSI13#test1");
+            assert_eq!(item["GSI13SK"].as_s().unwrap(), "GSI13#NAME#Test");
+            assert_eq!(item["id"].as_s().unwrap(), "test1");
+            assert_eq!(item["name"].as_s().unwrap(), "Test");
+            assert_eq!(item["email"].as_s().unwrap(), "my_email@not_real.com");
+        }
+
+        #[test]
+        fn test_entity_deserializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.clone().into_item();
+            let entity_type = TestTable::deserialize_entity_type(&item["entity_type"])
+                .unwrap()
+                .to_owned();
+            let clone = TestEntity::from_item(item).unwrap();
+
+            assert_eq!(entity, clone);
+            assert_eq!(entity_type, TestEntity::ENTITY_TYPE);
         }
     }
 
-    #[test]
-    fn test_entity_serializes_as_expected() {
-        let entity = TestEntity {
-            id: "test1".to_string(),
-            name: "Test".to_string(),
-            email: "my_email@not_real.com".to_string(),
-        };
+    mod as_string_set {
+        use super::*;
 
-        let item = entity.into_item();
-        assert_eq!(item.len(), 8);
-        assert_eq!(item["entity_type"].as_s().unwrap(), "test_ent");
-        assert_eq!(item["PK"].as_s().unwrap(), "PK#test1");
-        assert_eq!(item["SK"].as_s().unwrap(), "NAME#my_email@not_real.com");
-        assert_eq!(item["GSI13PK"].as_s().unwrap(), "GSI13#test1");
-        assert_eq!(item["GSI13SK"].as_s().unwrap(), "GSI13#NAME#Test");
-        assert_eq!(item["id"].as_s().unwrap(), "test1");
-        assert_eq!(item["name"].as_s().unwrap(), "Test");
-        assert_eq!(item["email"].as_s().unwrap(), "my_email@not_real.com");
+        struct TestTable;
+        impl Table for TestTable {
+            type PrimaryKey = keys::Primary;
+            type IndexKeys = keys::Gsi13;
+
+            fn client(&self) -> &aws_sdk_dynamodb::Client {
+                unimplemented!()
+            }
+
+            fn table_name(&self) -> &str {
+                unimplemented!()
+            }
+
+            fn deserialize_entity_type(
+                attr: &AttributeValue,
+            ) -> Result<&EntityTypeNameRef, MalformedEntityTypeError> {
+                let values = attr.as_ss().map_err(|_| {
+                    MalformedEntityTypeError::Custom("expected a string set".into())
+                })?;
+                let value = values
+                    .first()
+                    .expect("a DynamoDB string set always has at least one element");
+                Ok(EntityTypeNameRef::from_str(value.as_str()))
+            }
+
+            fn serialize_entity_type(entity_type: &EntityTypeNameRef) -> AttributeValue {
+                AttributeValue::Ss(vec![entity_type.to_string()])
+            }
+        }
+
+        #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+        struct TestEntity {
+            id: String,
+            name: String,
+            email: String,
+        }
+
+        impl EntityDef for TestEntity {
+            const ENTITY_TYPE: &'static EntityTypeNameRef =
+                EntityTypeNameRef::from_static("test_ent");
+        }
+
+        impl Entity for TestEntity {
+            type KeyInput<'a> = (&'a str, &'a str);
+            type Table = TestTable;
+            type IndexKeys = keys::Gsi13;
+
+            fn primary_key((id, email): Self::KeyInput<'_>) -> keys::Primary {
+                keys::Primary {
+                    hash: format!("PK#{id}"),
+                    range: format!("NAME#{email}"),
+                }
+            }
+
+            fn full_key(&self) -> keys::FullKey<keys::Primary, Self::IndexKeys> {
+                keys::FullKey {
+                    primary: Self::primary_key((&self.id, &self.email)),
+                    indexes: keys::Gsi13 {
+                        hash: format!("GSI13#{}", self.id),
+                        range: format!("GSI13#NAME#{}", self.name),
+                    },
+                }
+            }
+        }
+
+        #[test]
+        fn test_entity_serializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.into_item();
+            assert_eq!(item.len(), 8);
+            assert_eq!(
+                item["entity_type"].as_ss().unwrap(),
+                &["test_ent".to_owned()]
+            );
+            assert_eq!(item["PK"].as_s().unwrap(), "PK#test1");
+            assert_eq!(item["SK"].as_s().unwrap(), "NAME#my_email@not_real.com");
+            assert_eq!(item["GSI13PK"].as_s().unwrap(), "GSI13#test1");
+            assert_eq!(item["GSI13SK"].as_s().unwrap(), "GSI13#NAME#Test");
+            assert_eq!(item["id"].as_s().unwrap(), "test1");
+            assert_eq!(item["name"].as_s().unwrap(), "Test");
+            assert_eq!(item["email"].as_s().unwrap(), "my_email@not_real.com");
+        }
+
+        #[test]
+        fn test_entity_deserializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.clone().into_item();
+            let entity_type = TestTable::deserialize_entity_type(&item["entity_type"])
+                .unwrap()
+                .to_owned();
+            let clone = TestEntity::from_item(item).unwrap();
+
+            assert_eq!(entity, clone);
+            assert_eq!(entity_type, TestEntity::ENTITY_TYPE);
+        }
+    }
+
+    mod alternate_attribute {
+        use super::*;
+
+        struct TestTable;
+        impl Table for TestTable {
+            const ENTITY_TYPE_ATTRIBUTE: &'static str = "et";
+
+            type PrimaryKey = keys::Primary;
+            type IndexKeys = keys::Gsi13;
+
+            fn client(&self) -> &aws_sdk_dynamodb::Client {
+                unimplemented!()
+            }
+
+            fn table_name(&self) -> &str {
+                unimplemented!()
+            }
+        }
+
+        #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+        struct TestEntity {
+            id: String,
+            name: String,
+            email: String,
+        }
+
+        impl EntityDef for TestEntity {
+            const ENTITY_TYPE: &'static EntityTypeNameRef =
+                EntityTypeNameRef::from_static("test_ent");
+        }
+
+        impl Entity for TestEntity {
+            type KeyInput<'a> = (&'a str, &'a str);
+            type Table = TestTable;
+            type IndexKeys = keys::Gsi13;
+
+            fn primary_key((id, email): Self::KeyInput<'_>) -> keys::Primary {
+                keys::Primary {
+                    hash: format!("PK#{id}"),
+                    range: format!("NAME#{email}"),
+                }
+            }
+
+            fn full_key(&self) -> keys::FullKey<keys::Primary, Self::IndexKeys> {
+                keys::FullKey {
+                    primary: Self::primary_key((&self.id, &self.email)),
+                    indexes: keys::Gsi13 {
+                        hash: format!("GSI13#{}", self.id),
+                        range: format!("GSI13#NAME#{}", self.name),
+                    },
+                }
+            }
+        }
+
+        #[test]
+        fn test_entity_serializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.into_item();
+            assert_eq!(item.len(), 8);
+            assert_eq!(item["et"].as_s().unwrap(), "test_ent");
+            assert_eq!(item["PK"].as_s().unwrap(), "PK#test1");
+            assert_eq!(item["SK"].as_s().unwrap(), "NAME#my_email@not_real.com");
+            assert_eq!(item["GSI13PK"].as_s().unwrap(), "GSI13#test1");
+            assert_eq!(item["GSI13SK"].as_s().unwrap(), "GSI13#NAME#Test");
+            assert_eq!(item["id"].as_s().unwrap(), "test1");
+            assert_eq!(item["name"].as_s().unwrap(), "Test");
+            assert_eq!(item["email"].as_s().unwrap(), "my_email@not_real.com");
+        }
+
+        #[test]
+        fn test_entity_deserializes_as_expected() {
+            let entity = TestEntity {
+                id: "test1".to_string(),
+                name: "Test".to_string(),
+                email: "my_email@not_real.com".to_string(),
+            };
+
+            let item = entity.clone().into_item();
+            let entity_type = TestTable::deserialize_entity_type(&item["et"])
+                .unwrap()
+                .to_owned();
+            let clone = TestEntity::from_item(item).unwrap();
+
+            assert_eq!(entity, clone);
+            assert_eq!(entity_type, TestEntity::ENTITY_TYPE);
+        }
     }
 }

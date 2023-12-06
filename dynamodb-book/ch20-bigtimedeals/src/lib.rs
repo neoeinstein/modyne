@@ -9,8 +9,8 @@ use modyne::{
     expr,
     keys::{self, IndexKey},
     model::{Scan, ScanSegment, TransactWrite},
-    projections, read_projection, Aggregate, Entity, EntityExt, Error, Item, ProjectionExt,
-    QueryInput, QueryInputExt, ScanInput, Table,
+    projections, read_projection, Aggregate, AttributeValue, Entity, EntityExt, EntityTypeNameRef,
+    Error, Item, ProjectionExt, QueryInput, QueryInputExt, ScanInput, Table,
 };
 use serde_dynamo::string_set::StringSet;
 use svix_ksuid::{Ksuid, KsuidLike};
@@ -45,6 +45,32 @@ impl Table for App {
 
     fn client(&self) -> &aws_sdk_dynamodb::Client {
         &self.client
+    }
+
+    /// For demonstration purposes, this example uses a non-standard
+    /// attribute value for storing the entity type
+    ///
+    /// In general, you don't need to specify this function, and use of the provided default
+    /// is recommended.
+    fn deserialize_entity_type(
+        attr: &AttributeValue,
+    ) -> Result<&EntityTypeNameRef, modyne::MalformedEntityTypeError> {
+        let values = attr.as_ss().map_err(|_| {
+            modyne::MalformedEntityTypeError::Custom("expected a string set".into())
+        })?;
+        let value = values
+            .first()
+            .expect("a DynamoDB string set always has at least one element");
+        Ok(EntityTypeNameRef::from_str(value.as_str()))
+    }
+
+    /// For demonstration purposes, this example uses a non-standard
+    /// attribute value for storing the entity type
+    ///
+    /// In general, you don't need to specify this function, and use of the provided default
+    /// is recommended.
+    fn serialize_entity_type(entity_type: &EntityTypeNameRef) -> AttributeValue {
+        AttributeValue::Ss(vec![entity_type.to_string()])
     }
 }
 
