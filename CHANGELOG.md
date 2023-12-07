@@ -7,8 +7,10 @@ The format of this changelog is based on [Keep a Changelog](https://keepachangel
 _Note_: Due to the updated MSRV of the AWS SDK, Modyne has updated its MSRV to 1.68.0
 
 - BREAKING: Updated the AWS SDK to 1.0 ([#13])
+- New: Added support for non-standard entity type attribute names and values ([#15])
 
 [#13](https://github.com/neoeinstein/modyne/issues/13)
+[#15](https://github.com/neoeinstein/modyne/issues/15)
 
 ## [0.2.1] - 2023-11-15
 

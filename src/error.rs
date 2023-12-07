@@ -139,6 +139,7 @@ pub(crate) enum InnerError {
     TransactWriteItems(#[from] SdkError<TransactWriteItemsError>),
     ItemDeserialization(#[from] ItemDeserializationError),
     MissingEntityType(#[from] MissingEntityTypeError),
+    MalformedEntityType(#[from] MalformedEntityTypeError),
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -161,6 +162,20 @@ impl ItemDeserializationError {
     }
 }
 
+/// The entity type attribute was not found on the item
 #[derive(Debug, thiserror::Error)]
-#[error("entity type is missing from item or is not a string")]
+#[error("entity type attribute is missing from the item")]
 pub(crate) struct MissingEntityTypeError {}
+
+/// The entity type attribute was found, but was malformed and could not be extracted
+#[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
+pub enum MalformedEntityTypeError {
+    /// The entity type attribute was expected to be a string value
+    #[error("expected the entity type attribute to be a string value")]
+    ExpectedStringValue,
+
+    /// Custom error indicating why the entity type attribute was malformed
+    #[error("entity type attribute value is malformed and could not be extracted from the item")]
+    Custom(#[from] Box<dyn std::error::Error + Send + Sync>),
+}

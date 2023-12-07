@@ -26,6 +26,9 @@ impl App {
 }
 
 impl Table for App {
+    /// For demonstration, this example uses a non-standard entity type attribute name
+    const ENTITY_TYPE_ATTRIBUTE: &'static str = "et";
+
     type PrimaryKey = SessionToken;
     type IndexKeys = UsernameKey;
 
