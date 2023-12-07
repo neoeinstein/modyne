@@ -4,6 +4,8 @@ The format of this changelog is based on [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
+## [0.3.0] - 2023-12-07
+
 _Note_: Due to the updated MSRV of the AWS SDK, Modyne has updated its MSRV to 1.68.0
 
 - BREAKING: Updated the AWS SDK to 1.0 ([#13])
