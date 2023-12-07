@@ -85,7 +85,10 @@ impl App {
             .name("#brands", "brands")
             .value(":brands", StringSet(vec![&brand.brand_name]))
             .name("#entity_type", "entity_type")
-            .value(":entity_type", <Brands as modyne::EntityDef>::ENTITY_TYPE);
+            .value(
+                ":entity_type",
+                StringSet(vec![<Brands as modyne::EntityDef>::ENTITY_TYPE]),
+            );
         let update = Brands::update(()).expression(expression);
 
         TransactWrite::new()
