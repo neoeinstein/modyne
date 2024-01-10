@@ -5,6 +5,7 @@ mod entity_def;
 mod parsing;
 mod projection;
 mod symbol;
+mod update;
 
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
@@ -23,6 +24,15 @@ pub fn derive_projection(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);
 
     crate::projection::generate(input)
+        .unwrap_or_else(|err| err.into_compile_error())
+        .into()
+}
+
+#[proc_macro_derive(IntoUpdate, attributes(serde))]
+pub fn derive_into_update(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as syn::DeriveInput);
+
+    crate::update::impl_into_update(input)
         .unwrap_or_else(|err| err.into_compile_error())
         .into()
 }
