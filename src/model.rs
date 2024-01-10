@@ -457,11 +457,60 @@ impl Update {
     }
 
     /// The typed update expression to be evaluated
+    ///
+    /// Example:
+    /// ```
+    /// use modyne::{EntityDef, EntityExt, IntoUpdate};
+    ///
+    /// struct MyStructKey {
+    ///     id: String
+    /// }
+    ///
+    ///#[derive(EntityDef)]
+    /// struct MyStruct {
+    ///     id: String,
+    ///     field_1: u32,
+    ///     field_2: u32
+    /// }
+    ///
+    /// #[derive(IntoUpdate)]
+    /// struct MyStructUpdate {
+    ///     field_1: Option<u32>,
+    ///     field_2: Option<u32>
+    /// }
+    ///
+    /// let update = MyStructUpdate {
+    ///     field_1: Some(20)
+    ///     field_2: None
+    /// }
+    /// MyStruct::update(MyStructKey{ id: "Test"}).expression(update)
+    /// ```
+    /// The above is equivalent to the following manual definition:
+    /// 
+    /// ```
+    /// use modyne::expr::Update;
+    /// 
+    /// let mut expr = Update::new("");
+    ///
+    /// if let Some(field_1) = update.field_1 {
+    ///     expr = expr.add_expression("SET #field_1 = :field_1");
+    ///     expr.name("#field_1", "field_1");
+    ///     expr.value(":field_1", field_1);
+    /// }
+    ///
+    /// if let Some(field_2) = update.field_2 {
+    ///     expr = expr.add_expression("SET #field_2 = :field_2");
+    ///     expr.name("#field_2", "field_2");
+    ///     expr.value(":field_2", field_2);
+    /// }
+    /// 
+    /// MyStruct::update(MyStructKey{ id: "Test"}).expression(expr)
+    /// ```
     #[inline]
-    pub fn expression(self, update: expr::Update) -> UpdateWithExpr {
+    pub fn expression(self, update: impl Into<expr::Update>) -> UpdateWithExpr {
         UpdateWithExpr {
             key: self.key,
-            update,
+            update: update.into(),
         }
     }
 }

@@ -333,17 +333,27 @@ pub struct Update {
 }
 
 impl Update {
+    fn replace_expression(expression: impl Into<String>) -> String {
+        expression
+            .into()
+            .replace('#', "#upd_")
+            .replace(':', ":upd_")
+    }
     /// Create a new update expression
     pub fn new(expression: impl Into<String>) -> Self {
         Self {
-            expression: expression
-                .into()
-                .replace('#', "#upd_")
-                .replace(':', ":upd_"),
+            expression: Self::replace_expression(expression),
             names: Vec::new(),
             values: Vec::new(),
             sensitive_values: Vec::new(),
         }
+    }
+    /// Adds a new expression to the `Update`
+    /// Prefer to use this over directly mutating the `expression` field.
+    pub fn add_expression(mut self, expression: impl Into<String>) -> Self {
+        let expression = Self::replace_expression(expression);
+        self.expression.push_str(&expression);
+        self
     }
 
     /// Add a name to the expression
@@ -410,17 +420,27 @@ pub struct Condition {
 }
 
 impl Condition {
+    fn replace_expression(expression: impl Into<String>) -> String {
+        expression
+            .into()
+            .replace('#', "#cnd_")
+            .replace(':', ":cnd_")
+    }
     /// Create a new condition expression
     pub fn new(expression: impl Into<String>) -> Self {
         Self {
-            expression: expression
-                .into()
-                .replace('#', "#cnd_")
-                .replace(':', ":cnd_"),
+            expression: Self::replace_expression(expression),
             names: Vec::new(),
             values: Vec::new(),
             sensitive_values: Vec::new(),
         }
+    }
+    /// Adds a new expression to the `Condition`
+    /// Prefer to use this over directly mutating the `expression` field.
+    pub fn add_expression(mut self, expression: impl Into<String>) -> Self {
+        let expression = Self::replace_expression(expression);
+        self.expression.push_str(&expression);
+        self
     }
 
     /// Add a name to the expression

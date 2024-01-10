@@ -36,6 +36,11 @@ pub use modyne_derive::EntityDef;
 /// have the following attribute: `#[entity(MyEntity)]`
 #[cfg(feature = "derive")]
 pub use modyne_derive::Projection;
+
+/// Derive macro for implementing [`Into<crate::expr::Update>`] for a struct. 
+#[cfg(feature = "derive")]
+pub use modyne_derive::IntoUpdate;
+
 use serde_dynamo::aws_sdk_dynamodb_1 as codec;
 
 pub use crate::error::{Error, MalformedEntityTypeError};
