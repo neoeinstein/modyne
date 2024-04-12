@@ -15,6 +15,8 @@ jobs:
     steps:
       - id: release-please
         uses: google-github-actions/release-please-action@a37ac6e4f6449ce8b3f7607e4d97d0146028dc0b # v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_PAT }}
     outputs:
       release-modyne: ${{ steps.release-please.release_created }}
       release-example-ch18: ${{ steps.release-please['dynamodb-book/ch18-sessionstore'].release_created }}
