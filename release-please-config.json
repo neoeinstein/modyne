@@ -14,13 +14,19 @@
       "type": "linked-versions",
       "groupName": "modyne",
       "components": [
-        "modyne",
-        "modyne_derive"
+        ".",
+        "modyne-derive"
       ]
     }],
   "packages": {
-    ".": {},
-    "modyne-derive": {},
+    ".": {
+      "include-component-in-tag": false
+    },
+    "modyne-derive": {
+      "include-component-in-tag": false,
+      "skip-github-release": true,
+      "changelog-path": "../CHANGELOG.md"
+    },
     "dynamodb-book/ch18-sessionstore": {},
     "dynamodb-book/ch19-ecomm": {},
     "dynamodb-book/ch20-bigtimedeals": {},
