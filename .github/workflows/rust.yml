@@ -70,11 +70,11 @@ jobs:
       AWS_DEFAULT_REGION: us-east-1
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@1.68
+      - uses: dtolnay/rust-toolchain@1.71
       - uses: Swatinem/rust-cache@v2
       - uses: taiki-e/install-action@nextest
-      - run: cargo nextest run --workspace --no-fail-fast --features derive,once_cell --run-ignored all
-      - run: cargo test --workspace --doc --no-fail-fast --features derive,once_cell
+      - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
+      - run: cargo test --workspace --doc --no-fail-fast --features derive
 
   test:
     name: Test

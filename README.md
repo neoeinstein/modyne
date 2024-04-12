@@ -5,7 +5,7 @@ _An opinionated library for interacting with AWS DynamoDB single-table designs._
 [![docs.rs](https://img.shields.io/docsrs/modyne)][docsrs]
 [![crates.io](https://img.shields.io/crates/v/modyne)][cratesio]
 ![MIT/Apache-2.0 dual licensed](https://img.shields.io/crates/l/modyne)
-![modyne: rustc 1.70+](https://img.shields.io/badge/modyne-rustc_1.70+-lightgray.svg)†
+![modyne: rustc 1.71+](https://img.shields.io/badge/modyne-rustc_1.71+-lightgray.svg)
 
 ## Motive
 
@@ -53,9 +53,6 @@ For a more complete tour of the functionality in this crate, see the
 [documentation on docs.rs][docsrs].
 
 ---
-
-†: The MSRV for this crate can be lowered to 1.68.0 by enabling the
-`once_cell` feature.
 
 [cratesio]: https://crates.io/crates/modyne
 [docsrs]: https://docs.rs/modyne

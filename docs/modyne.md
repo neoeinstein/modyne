@@ -464,11 +464,7 @@ overrides to use a non-standard value codec with a non-standard attribute name.
 # Features
 
 - `derive`: Re-exports the derive macros provided by the `modyne-derive` crate.
-- `once_cell`: Uses the lazy initialization primitives provided by the
-  `once_cell` crate.
 
 # Minimum supported Rust version (MSRV)
 
-The minimum supported Rust version for this crate is 1.70.0. The MSRV can be
-reduced to 1.68.0 by enabling the `once_cell` feature to use that crate's lazy
-initialization primitives if desired.
+The minimum supported Rust version for this crate is 1.71.0.

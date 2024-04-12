@@ -557,13 +557,8 @@ impl Projection {
     }
 
     fn reserved_words() -> &'static FnvHashSet<&'static [u8]> {
-        #[cfg(not(feature = "once_cell"))]
         static RESERVED_WORDS_SET: std::sync::OnceLock<FnvHashSet<&'static [u8]>> =
             std::sync::OnceLock::new();
-
-        #[cfg(feature = "once_cell")]
-        static RESERVED_WORDS_SET: once_cell::sync::OnceCell<FnvHashSet<&'static [u8]>> =
-            once_cell::sync::OnceCell::new();
 
         RESERVED_WORDS_SET.get_or_init(|| {
             Self::RESERVED_WORDS
