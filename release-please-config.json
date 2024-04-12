@@ -5,28 +5,19 @@
   "bump-patch-for-minor-pre-major": true,
   "include-v-in-tag": true,
   "include-component-in-tag": true,
-  "last-release-sha": "ae3d16fe65d565bddf88d5d937e767adf1e05ac2",
-  "plugins": [
-    {
-      "type": "cargo-workspace",
-      "merge": false
-    }, {
-      "type": "linked-versions",
-      "groupName": "modyne",
-      "components": [
-        ".",
-        "modyne-derive"
-      ]
-    }],
+  "bootstrap-sha": "ae3d16fe65d565bddf88d5d937e767adf1e05ac2",
+  "plugins": ["cargo-workspace"],
   "packages": {
     ".": {
-      "include-component-in-tag": false
+      "exclude-paths": [
+        "dynamodb-book/ch18-sessionstore",
+        "dynamodb-book/ch19-ecomm",
+        "dynamodb-book/ch20-bigtimedeals",
+        "dynamodb-book/ch21-github",
+        "modyne-derive"
+      ]
     },
-    "modyne-derive": {
-      "include-component-in-tag": false,
-      "skip-github-release": true,
-      "changelog-path": "../CHANGELOG.md"
-    },
+    "modyne-derive": {},
     "dynamodb-book/ch18-sessionstore": {},
     "dynamodb-book/ch19-ecomm": {},
     "dynamodb-book/ch20-bigtimedeals": {},
