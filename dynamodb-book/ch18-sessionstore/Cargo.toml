@@ -10,7 +10,7 @@ documentation = "https://docs.rs/dynamodb-book-ch18-sessionstore"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
 license = "MIT OR Apache-2.0"
-rust-version = "1.71.0"
+rust-version = "1.74.0"
 
 [features]
 default = []

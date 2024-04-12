@@ -11,7 +11,7 @@ documentation = "https://docs.rs/dynamodb-book-ch21-github"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
 license = "MIT OR Apache-2.0"
-rust-version = "1.71.0"
+rust-version = "1.74.0"
 
 [features]
 default = []
