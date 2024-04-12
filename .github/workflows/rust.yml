@@ -18,7 +18,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -26,7 +26,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
       - run: cargo clippy --workspace --all-targets --features derive
 
   test-min:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       localstack:
-        image: localstack/localstack
+        image: localstack/localstack@sha256:e1017740b2726c6e86e8e917e9a1955281e49854694f90c87b6e527baa1bdbbb
         ports:
           - 4566:4566
         env:
@@ -45,9 +45,9 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: dtolnay/rust-toolchain@nightly
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
       - uses: taiki-e/install-action@nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       localstack:
-        image: localstack/localstack
+        image: localstack/localstack@sha256:e1017740b2726c6e86e8e917e9a1955281e49854694f90c87b6e527baa1bdbbb
         ports:
           - 4566:4566
         env:
@@ -69,9 +69,9 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: dtolnay/rust-toolchain@1.74
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
       - uses: taiki-e/install-action@nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       localstack:
-        image: localstack/localstack
+        image: localstack/localstack@sha256:e1017740b2726c6e86e8e917e9a1955281e49854694f90c87b6e527baa1bdbbb
         ports:
           - 4566:4566
         env:
@@ -92,9 +92,9 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
       - uses: taiki-e/install-action@nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
@@ -109,8 +109,8 @@ jobs:
           - bans licenses sources
     continue-on-error: ${{ matrix.checks == 'advisories' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
       - run: cargo install --locked cargo-deny
       - run: cargo deny --all-features check ${{ matrix.checks }}
