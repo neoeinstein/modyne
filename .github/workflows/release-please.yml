@@ -18,12 +18,14 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
     outputs:
+      releases:  ${{ steps.release-please.releases_created }}
       release-modyne: ${{ steps.release-please.release_created }}
       release-example-ch18: ${{ steps.release-please['dynamodb-book/ch18-sessionstore'].release_created }}
       release-example-ch19: ${{ steps.release-please['dynamodb-book/ch19-sessionstore'].release_created }}
       release-example-ch20: ${{ steps.release-please['dynamodb-book/ch20-sessionstore'].release_created }}
       release-example-ch21: ${{ steps.release-please['dynamodb-book/ch21-sessionstore'].release_created }}
   release-modyne:
+    if: needs.release-please.outputs.releases
     runs-on: ubuntu-latest
     needs: release-please
     steps:
