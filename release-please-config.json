@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "rust",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "include-v-in-tag": true,
+  "include-component-in-tag": true,
+  "last-release-sha": "ae3d16fe65d565bddf88d5d937e767adf1e05ac2",
+  "plugins": [
+    {
+      "type": "cargo-workspace",
+      "merge": false
+    }, {
+      "type": "linked-versions",
+      "groupName": "modyne",
+      "components": [
+        "modyne",
+        "modyne_derive"
+      ]
+    }],
+  "packages": {
+    ".": {},
+    "modyne-derive": {},
+    "dynamodb-book/ch18-sessionstore": {},
+    "dynamodb-book/ch19-ecomm": {},
+    "dynamodb-book/ch20-bigtimedeals": {},
+    "dynamodb-book/ch21-github": {}
+  }
+}
