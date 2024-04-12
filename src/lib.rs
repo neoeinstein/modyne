@@ -919,11 +919,7 @@ struct FullEntity<T: Entity> {
 
 #[doc(hidden)]
 pub mod __private {
-    #[cfg(not(feature = "once_cell"))]
     pub type OnceLock<T> = std::sync::OnceLock<T>;
-
-    #[cfg(feature = "once_cell")]
-    pub type OnceLock<T> = once_cell::sync::OnceCell<T>;
 
     pub fn get_entity_type<P: crate::Projection>(
         item: &crate::Item,
