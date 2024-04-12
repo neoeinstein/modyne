@@ -30,4 +30,4 @@ aws-config = "1.1.10"
 aws-credential-types = "1.1.8"
 test-log = { version = "0.2.15", default-features = false, features = ["trace"] }
 tokio = { version = "1.37", features = ["macros"] }
-tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
