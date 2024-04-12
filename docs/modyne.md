@@ -467,4 +467,4 @@ overrides to use a non-standard value codec with a non-standard attribute name.
 
 # Minimum supported Rust version (MSRV)
 
-The minimum supported Rust version for this crate is 1.71.0.
+The minimum supported Rust version for this crate is 1.74.0.
