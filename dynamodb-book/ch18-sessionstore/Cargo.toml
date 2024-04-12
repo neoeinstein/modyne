@@ -22,7 +22,7 @@ aws-sdk-dynamodb = "1.3.0"
 modyne = { version = "0.3.0", path = "../..", features = ["derive"] }
 serde = { version = "1.0.158", features = ["derive"] }
 time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
-tokio = { version = "1.0" }
+tokio = { version = "1.37" }
 tracing = "0.1.36"
 uuid = { version = "1.3.0", features = ["v4", "serde"] }
 
@@ -30,5 +30,5 @@ uuid = { version = "1.3.0", features = ["v4", "serde"] }
 aws-config = "1.1.10"
 aws-credential-types = "1.1.8"
 test-log = { version = "0.2.15", default-features = false, features = ["trace"] }
-tokio = { version = "1.0", features = ["macros"] }
+tokio = { version = "1.37", features = ["macros"] }
 tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
