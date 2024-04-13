@@ -18,13 +18,13 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
     outputs:
-      releases:  ${{ steps.release-please.releases_created }}
-      release-modyne-derive: ${{ steps.release-please['modyne-derive'].release_created }}
-      release-modyne: ${{ steps.release-please['modyne'].release_created }}
-      release-example-ch18: ${{ steps.release-please['dynamodb-book/ch18-sessionstore'].release_created }}
-      release-example-ch19: ${{ steps.release-please['dynamodb-book/ch19-sessionstore'].release_created }}
-      release-example-ch20: ${{ steps.release-please['dynamodb-book/ch20-sessionstore'].release_created }}
-      release-example-ch21: ${{ steps.release-please['dynamodb-book/ch21-sessionstore'].release_created }}
+      releases:  ${{ steps.release-please.outputs.releases_created }}
+      release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive'].release_created }}
+      release-modyne: ${{ steps.release-please.outputs['modyne'].release_created }}
+      release-example-ch18: ${{ steps.release-please.outputs['dynamodb-book/ch18-sessionstore'].release_created }}
+      release-example-ch19: ${{ steps.release-please.outputs['dynamodb-book/ch19-sessionstore'].release_created }}
+      release-example-ch20: ${{ steps.release-please.outputs['dynamodb-book/ch20-sessionstore'].release_created }}
+      release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-sessionstore'].release_created }}
   release:
     if: needs.release-please.outputs.releases
     runs-on: ubuntu-22.04
