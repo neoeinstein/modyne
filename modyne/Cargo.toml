@@ -34,4 +34,3 @@ tracing = "0.1.36"
 
 [package.metadata.docs.rs]
 features = ["derive"]
-
