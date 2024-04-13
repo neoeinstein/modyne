@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "modyne",
     "modyne-derive",
     "dynamodb-book/ch18-sessionstore",
     "dynamodb-book/ch19-ecomm",
