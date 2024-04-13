@@ -19,14 +19,14 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
     outputs:
       releases:  ${{ steps.release-please.outputs.releases_created }}
-      release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive'].release_created }}
-      release-modyne: ${{ steps.release-please.outputs['modyne'].release_created }}
-      release-example-ch18: ${{ steps.release-please.outputs['dynamodb-book/ch18-sessionstore'].release_created }}
-      release-example-ch19: ${{ steps.release-please.outputs['dynamodb-book/ch19-sessionstore'].release_created }}
-      release-example-ch20: ${{ steps.release-please.outputs['dynamodb-book/ch20-sessionstore'].release_created }}
-      release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-sessionstore'].release_created }}
+      release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive--release_created'] }}
+      release-modyne: ${{ steps.release-please.outputs['modyne--release_created'] }}
+      release-example-ch18: ${{ steps.release-please.outputs['dynamodb-book/ch18-sessionstore--release_created'] }}
+      release-example-ch19: ${{ steps.release-please.outputs['dynamodb-book/ch19-sessionstore--release_created'] }}
+      release-example-ch20: ${{ steps.release-please.outputs['dynamodb-book/ch20-sessionstore--release_created'] }}
+      release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-sessionstore--release_created'] }}
   release:
-    if: needs.release-please.outputs.releases
+    if: needs.release-please.outputs.releases == 'true'
     runs-on: ubuntu-22.04
     needs: release-please
     steps:
@@ -34,37 +34,37 @@ jobs:
       - name: Install Stable Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Publish modyne_derive crate
-        if: needs.release-please.outputs.release-modyne-derive
+        if: needs.release-please.outputs.release-modyne-derive == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p modyne_derive
         shell: bash
       - name: Publish modyne crate
-        if: needs.release-please.outputs.release-modyne
+        if: needs.release-please.outputs.release-modyne == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p modyne
         shell: bash
       - name: Publish DynamoDB Book Session Store example
-        if: needs.release-please.outputs.release-example-ch18
+        if: needs.release-please.outputs.release-example-ch18 == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p dynamodb-book-ch18-sessionstore
         shell: bash
       - name: Publish DynamoDB Book eComm example
-        if: needs.release-please.outputs.release-example-ch19
+        if: needs.release-please.outputs.release-example-ch19 == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p dynamodb-book-ch19-ecomm
         shell: bash
       - name: Publish DynamoDB Book Big Time Deals example
-        if: needs.release-please.outputs.release-example-ch20
+        if: needs.release-please.outputs.release-example-ch20 == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p dynamodb-book-ch20-bigtimedeals
         shell: bash
       - name: Publish DynamoDB Book GitHub example
-        if: needs.release-please.outputs.release-example-ch21
+        if: needs.release-please.outputs.release-example-ch21 == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish -p dynamodb-book-ch21-github
