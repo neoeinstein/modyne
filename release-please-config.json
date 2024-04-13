@@ -8,15 +8,7 @@
   "bootstrap-sha": "ae3d16fe65d565bddf88d5d937e767adf1e05ac2",
   "plugins": ["cargo-workspace"],
   "packages": {
-    ".": {
-      "exclude-paths": [
-        "dynamodb-book/ch18-sessionstore",
-        "dynamodb-book/ch19-ecomm",
-        "dynamodb-book/ch20-bigtimedeals",
-        "dynamodb-book/ch21-github",
-        "modyne-derive"
-      ]
-    },
+    "modyne": {},
     "modyne-derive": {},
     "dynamodb-book/ch18-sessionstore": {},
     "dynamodb-book/ch19-ecomm": {},
