@@ -25,7 +25,7 @@ jobs:
       release-example-ch19: ${{ steps.release-please['dynamodb-book/ch19-sessionstore'].release_created }}
       release-example-ch20: ${{ steps.release-please['dynamodb-book/ch20-sessionstore'].release_created }}
       release-example-ch21: ${{ steps.release-please['dynamodb-book/ch21-sessionstore'].release_created }}
-  release-modyne-derive:
+  release:
     if: needs.release-please.outputs.releases
     runs-on: ubuntu-22.04
     needs: release-please
@@ -33,81 +33,39 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Stable Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
-      - name: Publish modyne crate
+      - name: Publish modyne_derive crate
         if: needs.release-please.outputs.release-modyne-derive
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p modyne_derive
         shell: bash
-  release-modyne:
-    if: needs.release-please.outputs.release-modyne || needs.release-please.outputs.release-example-ch18 || needs.release-please.outputs.release-example-ch19 || needs.release-please.outputs.release-example-ch20 || needs.release-please.outputs.release-example-ch21
-    runs-on: ubuntu-22.04
-    needs: [ release-modyne-derive, release-please ]
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Install Stable Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - name: Publish modyne crate
         if: needs.release-please.outputs.release-modyne
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p modyne
         shell: bash
-  release-example-ch18:
-    if: needs.release-please.outputs.release-example-ch18
-    runs-on: ubuntu-22.04
-    needs: [ release-modyne, release-please ]
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Install Stable Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - name: Publish DynamoDB Book Session Store example
+        if: needs.release-please.outputs.release-example-ch18
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p dynamodb-book-ch18-sessionstore
         shell: bash
-  release-example-ch19:
-    if: needs.release-please.outputs.release-example-ch19
-    runs-on: ubuntu-22.04
-    needs: [ release-modyne, release-please ]
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Install Stable Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - name: Publish DynamoDB Book eComm example
+        if: needs.release-please.outputs.release-example-ch19
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p dynamodb-book-ch19-ecomm
         shell: bash
-  release-example-ch20:
-    if: needs.release-please.outputs.release-example-ch20
-    runs-on: ubuntu-22.04
-    needs: [ release-modyne, release-please ]
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Install Stable Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - name: Publish DynamoDB Book Big Time Deals example
+        if: needs.release-please.outputs.release-example-ch20
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p dynamodb-book-ch20-bigtimedeals
         shell: bash
-  release-example-ch21:
-    if: needs.release-please.outputs.release-example-ch21
-    runs-on: ubuntu-22.04
-    needs: [ release-modyne, release-please ]
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Install Stable Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
       - name: Publish DynamoDB Book GitHub example
+        if: needs.release-please.outputs.release-example-ch21
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-          CARGO_PUBLISH_TIMEOUT: '0'
         run: cargo publish -p dynamodb-book-ch21-github
         shell: bash
