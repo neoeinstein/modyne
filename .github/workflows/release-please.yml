@@ -11,7 +11,7 @@ on:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - id: release-please
         uses: google-github-actions/release-please-action@a37ac6e4f6449ce8b3f7607e4d97d0146028dc0b # v4
@@ -19,15 +19,31 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
     outputs:
       releases:  ${{ steps.release-please.releases_created }}
-      release-modyne: ${{ steps.release-please.release_created }}
+      release-modyne-derive: ${{ steps.release-please['modyne-derive'].release_created }}
+      release-modyne: ${{ steps.release-please['modyne'].release_created }}
       release-example-ch18: ${{ steps.release-please['dynamodb-book/ch18-sessionstore'].release_created }}
       release-example-ch19: ${{ steps.release-please['dynamodb-book/ch19-sessionstore'].release_created }}
       release-example-ch20: ${{ steps.release-please['dynamodb-book/ch20-sessionstore'].release_created }}
       release-example-ch21: ${{ steps.release-please['dynamodb-book/ch21-sessionstore'].release_created }}
-  release-modyne:
+  release-modyne-derive:
     if: needs.release-please.outputs.releases
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: release-please
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Install Stable Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Publish modyne crate
+        if: needs.release-please.outputs.release-modyne-derive
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          CARGO_PUBLISH_TIMEOUT: '0'
+        run: cargo publish -p modyne_derive
+        shell: bash
+  release-modyne:
+    if: needs.release-please.outputs.release-modyne || needs.release-please.outputs.release-example-ch18 || needs.release-please.outputs.release-example-ch19 || needs.release-please.outputs.release-example-ch20 || needs.release-please.outputs.release-example-ch21
+    runs-on: ubuntu-22.04
+    needs: [ release-modyne-derive, release-please ]
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Install Stable Rust Toolchain
@@ -37,13 +53,11 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           CARGO_PUBLISH_TIMEOUT: '0'
-        run: |
-          cargo publish -p modyne_derive
-          cargo publish -p modyne
+        run: cargo publish -p modyne
         shell: bash
   release-example-ch18:
     if: needs.release-please.outputs.release-example-ch18
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ release-modyne, release-please ]
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -57,7 +71,7 @@ jobs:
         shell: bash
   release-example-ch19:
     if: needs.release-please.outputs.release-example-ch19
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ release-modyne, release-please ]
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -71,7 +85,7 @@ jobs:
         shell: bash
   release-example-ch20:
     if: needs.release-please.outputs.release-example-ch20
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ release-modyne, release-please ]
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
@@ -85,7 +99,7 @@ jobs:
         shell: bash
   release-example-ch21:
     if: needs.release-please.outputs.release-example-ch21
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [ release-modyne, release-please ]
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
