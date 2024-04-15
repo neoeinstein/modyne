@@ -22,13 +22,13 @@ jobs:
         if: steps.release-please.outputs.prs_created == 'true'
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
-          ref: ${{ fromJson(steps.release-please.outputs.pr).baseBranchName }}
+          ref: ${{ fromJson(steps.release-please.outputs.pr).headBranchName }}
       - name: Fix up versions
         if: steps.release-please.outputs.prs_created == 'true'
         run: |
           sed --in-place --regexp-extended \
-            -e '/^\[dependencies\]$/,/^\[/s/modyne-derive = \{ version = "([[:digit:]]+\.[[:digit:]]+)(\.[[:digit:]]+)?"/modyne-derive = { version = "\1"/'
-            -e '/\.dependencies\]$/,/^$/s/modyne-derive = \{ version = "=?([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"/modyne-derive = { version = "=\1"/'
+            -e '/^\[dependencies\]$/,/^\[/s/modyne-derive = \{ version = "([[:digit:]]+\.[[:digit:]]+)(\.[[:digit:]]+)?"/modyne-derive = { version = "\1"/' \
+            -e '/\.dependencies\]$/,/^$/s/modyne-derive = \{ version = "=?([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"/modyne-derive = { version = "=\1"/' \
             modyne/Cargo.toml
         shell: bash
       - uses: devops-infra/action-commit-push@v0.9.2
