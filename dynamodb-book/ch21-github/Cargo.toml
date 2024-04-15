@@ -1,6 +1,6 @@
 [package]
 name = "dynamodb-book-ch21-github"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Marcus Griep <marcus@griep.us>"]
 description = "Models from The DynamoDB Book GitHub example"
@@ -22,7 +22,7 @@ aliri_braid = "0.4.0"
 aws-sdk-dynamodb = "1.3.0"
 castaway = "0.2.2"
 compact_str = { version = "0.7.0", features = ["serde"] }
-modyne = { version = "0.3.0", path = "../../modyne", features = ["derive"] }
+modyne = { version = "0.3.1", path = "../../modyne", features = ["derive"] }
 serde = { version = "1.0.158", features = ["derive"] }
 serde_dynamo = "4.2.3"
 svix-ksuid = { version = "0.8.0", features = ["serde"] }
