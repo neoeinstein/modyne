@@ -34,7 +34,7 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           file_pattern: modyne/Cargo.toml
-          commit_options: --amend -C HEAD
+          commit_message: "chore: fixup modyne-derive dependency references"
     outputs:
       releases:  ${{ steps.release-please.outputs.releases_created }}
       release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive--release_created'] }}
