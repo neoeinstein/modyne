@@ -30,10 +30,11 @@ jobs:
             -e '/^\[dependencies\]$/,/^\[/s/modyne-derive = \{ version = "([[:digit:]]+\.[[:digit:]]+)(\.[[:digit:]]+)?"/modyne-derive = { version = "\1"/' \
             -e '/\.dependencies\]$/,/^$/s/modyne-derive = \{ version = "=?([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"/modyne-derive = { version = "=\1"/' \
             modyne/Cargo.toml
-          git add modyne/Cargo.toml
-          git commit --amend -C HEAD
-          git push --force-with-lease
         shell: bash
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          file_pattern: modyne/Cargo.toml
+          commit_options: --amend -C HEAD
     outputs:
       releases:  ${{ steps.release-please.outputs.releases_created }}
       release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive--release_created'] }}
