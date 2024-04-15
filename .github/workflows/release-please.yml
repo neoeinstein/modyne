@@ -30,14 +30,10 @@ jobs:
             -e '/^\[dependencies\]$/,/^\[/s/modyne-derive = \{ version = "([[:digit:]]+\.[[:digit:]]+)(\.[[:digit:]]+)?"/modyne-derive = { version = "\1"/' \
             -e '/\.dependencies\]$/,/^$/s/modyne-derive = \{ version = "=?([[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+)"/modyne-derive = { version = "=\1"/' \
             modyne/Cargo.toml
+          git add modyne/Cargo.toml
+          git commit --amend -C HEAD
+          git push --force-with-lease
         shell: bash
-      - uses: devops-infra/action-commit-push@v0.9.2
-        if: steps.release-please.outputs.prs_created == 'true'
-        with:
-          github_token: "${{ secrets.RELEASE_PLEASE_PAT }}"
-          amend: true
-          force: true
-          no_edit: true
     outputs:
       releases:  ${{ steps.release-please.outputs.releases_created }}
       release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive--release_created'] }}
