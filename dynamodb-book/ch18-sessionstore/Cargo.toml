@@ -1,0 +1,34 @@
+[package]
+name = "dynamodb-book-ch18-sessionstore"
+version = "0.3.1"
+edition = "2021"
+authors = ["Marcus Griep <marcus@griep.us>"]
+description = "Models from The DynamoDB Book Session Store example"
+keywords = ["dynamodb","aws","aws-sdk","dynamo","orm"]
+categories = ["database","api-bindings"]
+documentation = "https://docs.rs/dynamodb-book-ch18-sessionstore"
+homepage = "https://github.com/neoeinstein/modyne"
+repository = "https://github.com/neoeinstein/modyne"
+license = "MIT OR Apache-2.0"
+rust-version = "1.74.0"
+
+[features]
+default = []
+once_cell = []
+
+[dependencies]
+aliri_braid = "0.4.0"
+aws-sdk-dynamodb = "1.3.0"
+modyne = { version = "0.3.1", path = "../../modyne", features = ["derive"] }
+serde = { version = "1.0.158", features = ["derive"] }
+time = { version = "0.3.20", features = ["formatting", "parsing", "serde"] }
+tokio = { version = "1.37" }
+tracing = "0.1.36"
+uuid = { version = "1.3.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+aws-config = "1.2.0"
+aws-credential-types = "1.2.0"
+test-log = { version = "0.2.15", default-features = false, features = ["trace"] }
+tokio = { version = "1.37", features = ["macros"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

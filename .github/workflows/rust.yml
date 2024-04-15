@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - trying
+  pull_request:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - run: cargo +nightly fmt --all -- --check
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - run: cargo clippy --workspace --all-targets --features derive
+
+  test-min:
+    name: Test Minimal Versions
+    runs-on: ubuntu-22.04
+    services:
+      localstack:
+        image: localstack/localstack@sha256:08e0cd7091401861b3d49d67e50d25659737fb4cd3a8fe27c903af02c08f751d
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
+      - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
+
+
+  test-msrv:
+    name: Test MSRV
+    runs-on: ubuntu-22.04
+    services:
+      localstack:
+        image: localstack/localstack@sha256:08e0cd7091401861b3d49d67e50d25659737fb4cd3a8fe27c903af02c08f751d
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: dtolnay/rust-toolchain@1.74
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
+      - run: cargo test --workspace --doc --no-fail-fast --features derive
+
+  test:
+    name: Test
+    runs-on: ubuntu-22.04
+    services:
+      localstack:
+        image: localstack/localstack@sha256:08e0cd7091401861b3d49d67e50d25659737fb4cd3a8fe27c903af02c08f751d
+        ports:
+          - 4566:4566
+        env:
+          SERVICES: dynamodb
+          EAGER_SERVICE_LOADING: 1
+    env:
+      RUST_LOG: info
+      RUST_LOG_SPAN_EVENTS: close
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - uses: taiki-e/install-action@nextest
+      - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
+      - run: cargo test --workspace --doc --no-fail-fast --features derive
+
+  deny:
+    name: Check Constraints
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        checks:
+          - advisories
+          - bans licenses sources
+    continue-on-error: ${{ matrix.checks == 'advisories' }}
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - run: cargo install --locked cargo-deny
+      - run: cargo deny --all-features check ${{ matrix.checks }}

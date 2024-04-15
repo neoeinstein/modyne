@@ -1,0 +1,8 @@
+{
+  "modyne": "0.3.1",
+  "modyne-derive": "0.3.1",
+  "dynamodb-book/ch18-sessionstore": "0.3.1",
+  "dynamodb-book/ch19-ecomm": "0.3.1",
+  "dynamodb-book/ch20-bigtimedeals": "0.3.1",
+  "dynamodb-book/ch21-github": "0.3.1"
+}

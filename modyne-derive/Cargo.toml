@@ -1,0 +1,27 @@
+[package]
+name = "modyne-derive"
+description = "Derive macros for modyne"
+version = "0.3.1"
+authors = ["Marcus Griep <marcus@griep.us>"]
+edition = "2021"
+readme = "../README.md"
+license = "MIT OR Apache-2.0"
+keywords = ["dynamodb","aws","aws-sdk","dynamo","orm"]
+categories = ["database","api-bindings"]
+documentation = "https://docs.rs/modyne-derive"
+homepage = "https://github.com/neoeinstein/modyne"
+repository = "https://github.com/neoeinstein/modyne"
+rust-version = "1.74.0"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.60"
+quote = "1.0.28"
+syn = "2.0.18"
+
+[dev-dependencies]
+pretty_assertions = "1.4.0"
+serde = { version = "1", features = [ "derive" ] }
+serde_json = "1"
