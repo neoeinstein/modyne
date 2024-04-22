@@ -18,7 +18,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -26,7 +26,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
       - run: cargo clippy --workspace --all-targets --features derive
 
   test-min:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3
+        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -45,10 +45,12 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@nightly
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+        with:
+          tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
@@ -58,7 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3
+        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -69,10 +71,12 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@1.74
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+        with:
+          tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
@@ -81,7 +85,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3
+        image: localstack/localstack@sha256:06403b6c35b5cc4b6b15652fc10965982853172890efa87010a9545efe8dd42e # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -92,10 +96,12 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+        with:
+          tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
@@ -109,8 +115,10 @@ jobs:
           - bans licenses sources
     continue-on-error: ${{ matrix.checks == 'advisories' }}
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - run: cargo install --locked cargo-deny
+      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+        with:
+          tool: cargo-deny
       - run: cargo deny --all-features check ${{ matrix.checks }}
