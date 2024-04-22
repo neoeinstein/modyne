@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack:3
+        image: localstack/localstack@sha256:b5c082a6d78d49fc4a102841648a8adeab4895f7d9a4ad042d7d485aed2da10d # 3
         ports:
           - 4566:4566
         env:
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@nextest
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack:3
+        image: localstack/localstack@sha256:b5c082a6d78d49fc4a102841648a8adeab4895f7d9a4ad042d7d485aed2da10d # 3
         ports:
           - 4566:4566
         env:
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - uses: dtolnay/rust-toolchain@1.74
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@nextest
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack:3
+        image: localstack/localstack@sha256:b5c082a6d78d49fc4a102841648a8adeab4895f7d9a4ad042d7d485aed2da10d # 3
         ports:
           - 4566:4566
         env:
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
-      - uses: taiki-e/install-action@nextest
+      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
