@@ -32,6 +32,7 @@ jobs:
             modyne/Cargo.toml
         shell: bash
       - uses: stefanzweifel/git-auto-commit-action@v5
+        if: steps.release-please.outputs.prs_created == 'true'
         with:
           file_pattern: modyne/Cargo.toml
           commit_message: "chore: fixup modyne-derive dependency references"
