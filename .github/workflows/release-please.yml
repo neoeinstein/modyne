@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
       - run: echo '${{ toJson(steps.release-please.outputs) }}' | jq
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
         if: steps.release-please.outputs.prs_created == 'true'
         with:
           token: ${{ secrets.RELEASE_PLEASE_PAT }}
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: release-please
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4
       - name: Install Stable Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Publish modyne_derive crate
