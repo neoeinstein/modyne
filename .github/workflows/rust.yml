@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+      - uses: taiki-e/install-action@6ad9974df998e38cabfa03b4cedaade74e8e659e # v2.33.4
         with:
           tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@1.74
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+      - uses: taiki-e/install-action@6ad9974df998e38cabfa03b4cedaade74e8e659e # v2.33.4
         with:
           tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+      - uses: taiki-e/install-action@6ad9974df998e38cabfa03b4cedaade74e8e659e # v2.33.4
         with:
           tool: nextest
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@ae2e9b7a2b49bd024f054ed0ef11283e30e85b2e # v2.33.4
+      - uses: taiki-e/install-action@6ad9974df998e38cabfa03b4cedaade74e8e659e # v2.33.4
         with:
           tool: cargo-deny
       - run: cargo deny --all-features check ${{ matrix.checks }}
