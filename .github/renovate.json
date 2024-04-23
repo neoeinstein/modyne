@@ -5,44 +5,7 @@
     "local>neoeinstein/renovate-config//rust/library",
     "local>neoeinstein/renovate-config:approve-breaking",
     ":automergeDigest",
+    "local>neoeinstein/renovate-config//actions/automerge-non-breaking-build-tools",
     ":rebaseStalePrs"
-  ],
-  "customManagers": [
-    {
-      "description": "Update Rust tool dependencies in GitHub Actions workflows",
-      "customType": "regex",
-      "fileMatch": [
-        "(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$",
-        "(^|/)action\\.ya?ml$"
-      ],
-      "matchStrings": [
-        "- uses: +taiki-e/install-action@[^\\n]+\\n\\s+with:\\n\\s+tool: +(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
-      ],
-      "depTypeTemplate": "build-tools",
-      "datasourceTemplate": "crate",
-      "versioningTemplate": "semver-coerced"
-    }
-  ],
-  "packageRules": [
-    {
-      "extends": [
-        "github>neoeinstein/renovate-config:semver/non-breaking/unstable"
-      ],
-      "matchDepTypes": [
-        "build-tools"
-      ],
-      "groupName": "build tools",
-      "automerge": true
-    },
-    {
-      "extends": [
-        "github>neoeinstein/renovate-config:semver/non-breaking/stable"
-      ],
-      "matchDepTypes": [
-        "build-tools"
-      ],
-      "groupName": "build tools",
-      "automerge": true
-    }
   ]
 }
