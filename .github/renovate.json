@@ -15,11 +15,10 @@
         "(^|/)action\\.ya?ml$"
       ],
       "matchStrings": [
-        "tool:\\s+(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
+        "- uses:[ \\t]+taiki-e/install-action@[^\\n]+\\n\\s+with:\\n\\s+tool:[ \\t]+(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
       ],
-      "depTypeTemplate": "ci-tools",
       "datasourceTemplate": "crate",
-      "versioningTemplate": "cargo"
+      "versioningTemplate": "semver-coerced"
     }
   ]
 }
