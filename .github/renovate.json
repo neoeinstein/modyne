@@ -15,10 +15,31 @@
         "(^|/)action\\.ya?ml$"
       ],
       "matchStrings": [
-        "- uses:[ \\t]+taiki-e/install-action@[^\\n]+\\n\\s+with:\\n\\s+tool:[ \\t]+(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
+        "- uses: +taiki-e/install-action@[^\\n]+\\n\\s+with:\\n\\s+tool: +(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
       ],
+      "depTypeTemplate": "build-tools",
       "datasourceTemplate": "crate",
       "versioningTemplate": "semver-coerced"
+    }
+  ],
+  "packageRules": [
+    {
+      "extends": [
+        "github>neoeinstein/renovate-config:semver/non-breaking/unstable"
+      ],
+      "matchDepTypes": [
+        "build-tools"
+      ],
+      "groupName": "build tools"
+    },
+    {
+      "extends": [
+        "github>neoeinstein/renovate-config:semver/non-breaking/stable"
+      ],
+      "matchDepTypes": [
+        "build-tools"
+      ],
+      "groupName": "build tools"
     }
   ]
 }
