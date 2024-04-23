@@ -5,7 +5,7 @@
     "local>neoeinstein/renovate-config//rust/library",
     "local>neoeinstein/renovate-config:approve-breaking",
     ":automergeDigest",
-    ":rebaseStalePRs"
+    ":rebaseStalePrs"
   ],
   "customManagers": [
     {
