@@ -30,7 +30,8 @@
       "matchDepTypes": [
         "build-tools"
       ],
-      "groupName": "build tools"
+      "groupName": "build tools",
+      "automerge": true
     },
     {
       "extends": [
@@ -39,7 +40,8 @@
       "matchDepTypes": [
         "build-tools"
       ],
-      "groupName": "build tools"
+      "groupName": "build tools",
+      "automerge": true
     }
   ]
 }
