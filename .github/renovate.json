@@ -18,7 +18,7 @@
       ],
       "autoReplaceStringTemplate": "tool: {{{depName}}}@{{{newValue}}}",
       "depTypeTemplate": "tool",
-      "datasourceTemplate": "cargo"
+      "datasourceTemplate": "crate"
     }
   ]
 }
