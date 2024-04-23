@@ -17,33 +17,9 @@
       "matchStrings": [
         "tool:\\s+(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
       ],
-      "autoReplaceStringTemplate": "tool: {{{depName}}}@{{{newValue}}}",
       "depTypeTemplate": "ci-tools",
       "datasourceTemplate": "crate",
       "versioningTemplate": "cargo"
-    }
-  ],
-  "packageRules": [
-    {
-      "extends": [
-        "github>neoeinstein/renovate-config:semver/non-breaking/unstable"
-      ],
-      "matchDepTypes": ["ci-tools"],
-      "matchUpdateTypes": [
-        "patch"
-      ],
-      "enabled": true
-    },
-    {
-      "extends": [
-        "github>neoeinstein/renovate-config:semver/non-breaking/stable"
-      ],
-      "matchDepTypes": ["ci-tools"],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "enabled": true
     }
   ]
 }
