@@ -5,5 +5,20 @@
     "local>neoeinstein/renovate-config//rust/library",
     "local>neoeinstein/renovate-config:approve-breaking",
     ":automergeDigest"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$",
+        "(^|/)action\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "tool:\\s+(?<depName>[\\w\\d-_]+)@(?<currentValue>\\d+(?:\\.\\d+(?:\\.\\d+)))"
+      ],
+      "autoReplaceStringTemplate": "tool: {{{depName}}}@{{{newValue}}}",
+      "depTypeTemplate": "tool",
+      "datasourceTemplate": "cargo"
+    }
   ]
 }
