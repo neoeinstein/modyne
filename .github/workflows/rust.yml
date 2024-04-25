@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:ba8aede2c2e4e6cc9bde3c19f1af0c805d34f7903f6bbf239bc54d4871b779a2 # 3.3.0
+        image: localstack/localstack@sha256:b77d785a6692e3dd9b3361e3a6b014abf2556606af32d4d9bc044fbf53188a18 # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:ba8aede2c2e4e6cc9bde3c19f1af0c805d34f7903f6bbf239bc54d4871b779a2 # 3.3.0
+        image: localstack/localstack@sha256:b77d785a6692e3dd9b3361e3a6b014abf2556606af32d4d9bc044fbf53188a18 # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-22.04
     services:
       localstack:
-        image: localstack/localstack@sha256:ba8aede2c2e4e6cc9bde3c19f1af0c805d34f7903f6bbf239bc54d4871b779a2 # 3.3.0
+        image: localstack/localstack@sha256:b77d785a6692e3dd9b3361e3a6b014abf2556606af32d4d9bc044fbf53188a18 # 3.3.0
         ports:
           - 4566:4566
         env:
