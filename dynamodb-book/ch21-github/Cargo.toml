@@ -32,6 +32,6 @@ tracing = "0.1.36"
 [dev-dependencies]
 aws-config = "1.2.1"
 aws-credential-types = "1.2.0"
-test-log = { version = "0.2.15", default-features = false, features = ["trace"] }
+test-log = { version = "0.2.16", default-features = false, features = ["trace"] }
 tokio = { version = "1.37", features = ["macros"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
