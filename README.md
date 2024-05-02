@@ -5,7 +5,7 @@ _An opinionated library for interacting with AWS DynamoDB single-table designs._
 [![docs.rs](https://img.shields.io/docsrs/modyne)][docsrs]
 [![crates.io](https://img.shields.io/crates/v/modyne)][cratesio]
 ![MIT/Apache-2.0 dual licensed](https://img.shields.io/crates/l/modyne)
-![modyne: rustc 1.74+](https://img.shields.io/badge/modyne-rustc_1.74+-lightgray.svg)
+![modyne: rustc 1.75+](https://img.shields.io/badge/modyne-rustc_1.75+-lightgray.svg)
 
 ## Motive
 
