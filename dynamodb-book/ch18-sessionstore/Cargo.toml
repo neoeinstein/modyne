@@ -27,7 +27,7 @@ tracing = "0.1.36"
 uuid = { version = "1.3.0", features = ["v4", "serde"] }
 
 [dev-dependencies]
-aws-config = "1.2.1"
+aws-config = "1.3.0"
 aws-credential-types = "1.2.0"
 test-log = { version = "0.2.16", default-features = false, features = ["trace"] }
 tokio = { version = "1.37", features = ["macros"] }
