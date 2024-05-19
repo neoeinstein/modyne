@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@fce5fd6127201273e3afd1b0389ac6665710ce9c # v2.33.24
+      - uses: taiki-e/install-action@3c93f2e2e2ab1c382f583c229c2343dbb9f06554 # v2.33.25
         with:
           tool: cargo-nextest@0.9.70
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@1.75
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@fce5fd6127201273e3afd1b0389ac6665710ce9c # v2.33.24
+      - uses: taiki-e/install-action@3c93f2e2e2ab1c382f583c229c2343dbb9f06554 # v2.33.25
         with:
           tool: cargo-nextest@0.9.70
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@fce5fd6127201273e3afd1b0389ac6665710ce9c # v2.33.24
+      - uses: taiki-e/install-action@3c93f2e2e2ab1c382f583c229c2343dbb9f06554 # v2.33.25
         with:
           tool: cargo-nextest@0.9.70
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@fce5fd6127201273e3afd1b0389ac6665710ce9c # v2.33.24
+      - uses: taiki-e/install-action@3c93f2e2e2ab1c382f583c229c2343dbb9f06554 # v2.33.25
         with:
           tool: cargo-deny@0.14.23
       - run: cargo deny --all-features check ${{ matrix.checks }}
