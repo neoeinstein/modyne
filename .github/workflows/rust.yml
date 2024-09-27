@@ -16,7 +16,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@nightly
@@ -31,7 +31,7 @@ jobs:
 
   test-min:
     name: Test Minimal Versions
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
         image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
@@ -57,7 +57,7 @@ jobs:
 
   test-msrv:
     name: Test MSRV
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
         image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
@@ -82,7 +82,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
         image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
@@ -107,7 +107,7 @@ jobs:
 
   deny:
     name: Check Constraints
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         checks:
