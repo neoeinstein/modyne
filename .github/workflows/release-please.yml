@@ -11,7 +11,7 @@ on:
 
 jobs:
   release-please:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - id: release-please
         uses: google-github-actions/release-please-action@a37ac6e4f6449ce8b3f7607e4d97d0146028dc0b # v4.1.0
@@ -46,7 +46,7 @@ jobs:
       release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-sessionstore--release_created'] }}
   release:
     if: needs.release-please.outputs.releases == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: release-please
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
