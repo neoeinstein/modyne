@@ -120,5 +120,5 @@ jobs:
       - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
       - uses: taiki-e/install-action@0fc560009ad92371154ca652dcf2620d19331eee # v2.33.27
         with:
-          tool: cargo-deny@0.14.23
+          tool: cargo-deny@0.18.5
       - run: cargo deny --all-features check ${{ matrix.checks }}
