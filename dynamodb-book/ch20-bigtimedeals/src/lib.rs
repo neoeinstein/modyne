@@ -534,7 +534,7 @@ impl UsersStream {
     ) -> Option<(StreamOutput, StreamState)> {
         if let Some((last, mut items)) = state {
             if let Some(item) = items.pop_front() {
-                let parsed = User::from_item(item).map_err(Error::from);
+                let parsed = User::from_item(item);
                 return Some((parsed, Some((last, items))));
             }
 
@@ -562,7 +562,7 @@ impl UsersStream {
         let next = output.last_evaluated_key;
 
         let item = items.pop_front()?;
-        let parsed = User::from_item(item).map_err(Error::from);
+        let parsed = User::from_item(item);
 
         Some((parsed, Some((next, items))))
     }
@@ -579,6 +579,7 @@ impl futures::stream::Stream for UsersStream {
     }
 }
 
+#[allow(dead_code)]
 struct UserIndexScan;
 
 impl ScanInput for UserIndexScan {
@@ -643,7 +644,7 @@ impl Entity for Deal {
     type IndexKeys = (keys::Gsi1, keys::Gsi2, keys::Gsi3);
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("DEAL#{}", input);
+        let common = format!("DEAL#{input}");
         keys::Primary {
             hash: common.clone(),
             range: common,
@@ -656,15 +657,15 @@ impl Entity for Deal {
             primary: Self::primary_key(self.deal_id),
             indexes: (
                 keys::Gsi1 {
-                    hash: format!("DEALS#{}", date),
+                    hash: format!("DEALS#{date}"),
                     range: format!("DEAL#{}", self.deal_id),
                 },
                 keys::Gsi2 {
-                    hash: format!("BRAND#{}#{}", self.brand, date).to_ascii_uppercase(),
+                    hash: format!("BRAND#{}#{date}", self.brand).to_ascii_uppercase(),
                     range: format!("DEAL#{}", self.deal_id),
                 },
                 keys::Gsi3 {
-                    hash: format!("CATEGORY#{}#{}", self.category, date).to_ascii_uppercase(),
+                    hash: format!("CATEGORY#{}#{date}", self.category).to_ascii_uppercase(),
                     range: format!("DEAL#{}", self.deal_id),
                 },
             ),
@@ -685,7 +686,7 @@ impl Entity for Brand {
     type IndexKeys = ();
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("BRAND#{}", input).to_ascii_uppercase();
+        let common = format!("BRAND#{input}").to_ascii_uppercase();
         keys::Primary {
             hash: common.clone(),
             range: common,
@@ -806,7 +807,7 @@ impl Entity for Category {
     type IndexKeys = ();
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("CATEGORY#{}", input).to_ascii_uppercase();
+        let common = format!("CATEGORY#{input}").to_ascii_uppercase();
         keys::Primary {
             hash: common.clone(),
             range: common,
@@ -959,8 +960,8 @@ impl Entity for User {
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
         keys::Primary {
-            hash: format!("USER#{}", input),
-            range: format!("USER#{}", input),
+            hash: format!("USER#{input}"),
+            range: format!("USER#{input}"),
         }
     }
 
@@ -1095,7 +1096,7 @@ impl QueryInput for WatchersByBrandQuery<'_> {
         let partition = format!("BRANDWATCH#{}", self.brand_name);
         let bound = self
             .last_seen
-            .map(|id| format!("USER#{}", id))
+            .map(|id| format!("USER#{id}"))
             .unwrap_or_default();
         expr::KeyCondition::in_partition(partition).greater_than(bound)
     }
@@ -1117,7 +1118,7 @@ impl QueryInput for WatchersByCategoryQuery<'_> {
         let partition = format!("CATEGORYWATCH#{}", self.category_name);
         let bound = self
             .last_seen
-            .map(|id| format!("USER#{}", id))
+            .map(|id| format!("USER#{id}"))
             .unwrap_or_default();
         expr::KeyCondition::in_partition(partition).greater_than(bound)
     }
@@ -1160,10 +1161,10 @@ impl QueryInput for DealsByDateQuery {
 
     fn key_condition(&self) -> expr::KeyCondition<Self::Index> {
         let date = format_as_date(self.date);
-        let partition = format!("DEALS#{}", date);
+        let partition = format!("DEALS#{date}");
         let bound = self
             .last_seen
-            .map(|id| format!("DEAL#{}", id))
+            .map(|id| format!("DEAL#{id}"))
             .unwrap_or_else(|| "DEAL$".to_string());
         expr::KeyCondition::in_partition(partition).less_than(bound)
     }
@@ -1184,10 +1185,10 @@ impl QueryInput for BrandDealsByDateQuery<'_> {
 
     fn key_condition(&self) -> expr::KeyCondition<Self::Index> {
         let date = self.date.format(&Rfc3339).unwrap();
-        let partition = format!("BRAND#{}#{}", self.brand, date).to_ascii_uppercase();
+        let partition = format!("BRAND#{}#{date}", self.brand).to_ascii_uppercase();
         let bound = self
             .last_seen
-            .map(|id| format!("DEAL#{}", id))
+            .map(|id| format!("DEAL#{id}"))
             .unwrap_or_else(|| "DEAL$".to_string());
         expr::KeyCondition::in_partition(partition).less_than(bound)
     }
@@ -1208,10 +1209,10 @@ impl QueryInput for CategoryDealsByDateQuery<'_> {
 
     fn key_condition(&self) -> expr::KeyCondition<Self::Index> {
         let date = self.date.format(&Rfc3339).unwrap();
-        let partition = format!("CATEGORY#{}#{}", self.category, date).to_ascii_uppercase();
+        let partition = format!("CATEGORY#{}#{date}", self.category).to_ascii_uppercase();
         let bound = self
             .last_seen
-            .map(|id| format!("DEAL#{}", id))
+            .map(|id| format!("DEAL#{id}"))
             .unwrap_or_else(|| "DEAL$".to_string());
         expr::KeyCondition::in_partition(partition).less_than(bound)
     }

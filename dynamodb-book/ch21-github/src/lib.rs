@@ -59,7 +59,7 @@ pub struct RepositoryIdentity {
 }
 
 impl RepositoryIdentity {
-    fn borrowed(&self) -> RepositoryId {
+    fn borrowed(&self) -> RepositoryId<'_> {
         RepositoryId {
             repo_owner: &self.repo_owner,
             repo_name: &self.repo_name,
@@ -118,7 +118,7 @@ impl Entity for Repository {
                 fork_index,
                 keys::Gsi3 {
                     hash: format!("ACCOUNT#{}", self.id.repo_owner),
-                    range: format!("#{}", updated_at),
+                    range: format!("#{updated_at}"),
                 },
             ),
             primary,
@@ -429,7 +429,7 @@ impl Entity for User {
     type IndexKeys = keys::Gsi3;
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("ACCOUNT#{}", input);
+        let common = format!("ACCOUNT#{input}");
         keys::Primary {
             hash: common.clone(),
             range: common,
@@ -467,7 +467,7 @@ impl Entity for Organization {
     type IndexKeys = keys::Gsi3;
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("ACCOUNT#{}", input);
+        let common = format!("ACCOUNT#{input}");
         keys::Primary {
             hash: common.clone(),
             range: common,

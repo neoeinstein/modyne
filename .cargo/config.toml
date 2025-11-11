@@ -1,0 +1,11 @@
+# Cargo configuration for the modyne workspace
+#
+# The modyne crate's doctests require the `derive` feature to be enabled.
+# Use one of these commands to run tests:
+#   - cargo test --all-features       (runs all tests with all features)
+#   - cargo test --features derive    (runs tests with just the derive feature)
+#   - cargo test-all                  (alias defined below)
+
+[alias]
+# Convenient alias to run tests with all features enabled
+test-all = "test --all-features"

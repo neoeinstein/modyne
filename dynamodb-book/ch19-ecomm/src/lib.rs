@@ -186,7 +186,7 @@ impl Entity for Customer {
     type IndexKeys = ();
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("CUSTOMER#{}", input);
+        let common = format!("CUSTOMER#{input}");
         keys::Primary {
             hash: common.clone(),
             range: common,
@@ -210,7 +210,7 @@ impl Entity for CustomerEmail {
     type IndexKeys = ();
 
     fn primary_key(input: Self::KeyInput<'_>) -> keys::Primary {
-        let common = format!("CUSTOMEREMAIL#{}", input);
+        let common = format!("CUSTOMEREMAIL#{input}");
         keys::Primary {
             hash: common.clone(),
             range: common,

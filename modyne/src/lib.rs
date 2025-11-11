@@ -1,4 +1,5 @@
 #![doc = include_str!("../docs/modyne.md")]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![deny(rustdoc::broken_intra_doc_links)]
