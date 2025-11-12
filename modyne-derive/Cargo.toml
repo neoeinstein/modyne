@@ -1,7 +1,7 @@
 [package]
 name = "modyne-derive"
 description = "Derive macros for modyne"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Marcus Griep <marcus@griep.us>"]
 edition = "2021"
 readme = "../README.md"
@@ -11,17 +11,17 @@ categories = ["database","api-bindings"]
 documentation = "https://docs.rs/modyne-derive"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
-rust-version = "1.75.0"
+rust-version = "1.79.0"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.60"
-quote = "1.0.28"
-syn = "2.0.18"
+proc-macro2 = "1.0.103"
+quote = "1.0.42"
+syn = "2.0.110"
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
+pretty_assertions = "1.4.1"
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"

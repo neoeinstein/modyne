@@ -12,6 +12,7 @@ use modyne::{
             slow"]
 async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region("us-east-1")
         .endpoint_url("http://localhost:4566")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
@@ -89,6 +90,7 @@ async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send +
             slow"]
 async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+        .region("us-east-1")
         .endpoint_url("http://localhost:4566")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
