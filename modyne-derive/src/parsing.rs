@@ -147,8 +147,7 @@ pub fn get_lit_str2(
         Ok(lit.clone())
     } else {
         Err(meta.error(format!(
-            "expected serde {} attribute to be a string: `{} = \"...\"`",
-            attr_name, meta_item_name
+            "expected serde {attr_name} attribute to be a string: `{meta_item_name} = \"...\"`"
         )))
     }
 }
