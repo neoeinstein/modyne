@@ -16,7 +16,7 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@nightly
@@ -26,15 +26,15 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - run: cargo clippy --workspace --all-targets --features derive
 
   test-min:
     name: Test Minimal Versions
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
-        image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
+        image: localstack/localstack@sha256:f8f23f650b82d576a7d4b43256abb04195f9a37be14e4c2f8521615230af0987 # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -47,20 +47,20 @@ jobs:
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@nightly
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@0fc560009ad92371154ca652dcf2620d19331eee # v2.33.27
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+      - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
         with:
-          tool: cargo-nextest@0.9.70
+          tool: cargo-nextest@0.9.111
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
 
   test-msrv:
     name: Test MSRV
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
-        image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
+        image: localstack/localstack@sha256:f8f23f650b82d576a7d4b43256abb04195f9a37be14e4c2f8521615230af0987 # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -72,20 +72,20 @@ jobs:
       AWS_DEFAULT_REGION: us-east-1
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
-      - uses: dtolnay/rust-toolchain@1.75
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@0fc560009ad92371154ca652dcf2620d19331eee # v2.33.27
+      - uses: dtolnay/rust-toolchain@1.88
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+      - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
         with:
-          tool: cargo-nextest@0.9.70
+          tool: cargo-nextest@0.9.111
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
   test:
     name: Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       localstack:
-        image: localstack/localstack@sha256:91271bdd1a2c3e59cd43c97483c1394672c1e4d2e13e883cfac3f832b23b3876 # 3.3.0
+        image: localstack/localstack@sha256:f8f23f650b82d576a7d4b43256abb04195f9a37be14e4c2f8521615230af0987 # 3.3.0
         ports:
           - 4566:4566
         env:
@@ -98,16 +98,16 @@ jobs:
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@0fc560009ad92371154ca652dcf2620d19331eee # v2.33.27
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+      - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
         with:
-          tool: cargo-nextest@0.9.70
+          tool: cargo-nextest@0.9.111
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
   deny:
     name: Check Constraints
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         checks:
@@ -117,8 +117,8 @@ jobs:
     steps:
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2.7.3
-      - uses: taiki-e/install-action@0fc560009ad92371154ca652dcf2620d19331eee # v2.33.27
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+      - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
         with:
-          tool: cargo-deny@0.14.23
+          tool: cargo-deny@0.18.5
       - run: cargo deny --all-features check ${{ matrix.checks }}

@@ -290,7 +290,8 @@ macro_rules! impl_key_tuples {
 
 impl<T: IndexKey> IndexKeys for T {
     const KEY_DEFINITIONS: &'static [SecondaryIndexDefinition] = &[T::INDEX_DEFINITION];
-    type Serialize<'a> = &'a T
+    type Serialize<'a>
+        = &'a T
     where
         T: 'a;
     #[inline]
