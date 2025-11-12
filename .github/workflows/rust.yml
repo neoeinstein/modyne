@@ -18,7 +18,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
@@ -45,7 +45,7 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
@@ -71,7 +71,7 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: dtolnay/rust-toolchain@1.88
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
@@ -96,7 +96,7 @@ jobs:
       RUST_LOG_SPAN_EVENTS: close
       AWS_DEFAULT_REGION: us-east-1
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
@@ -115,7 +115,7 @@ jobs:
           - bans licenses sources
     continue-on-error: ${{ matrix.checks == 'advisories' }}
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@e797ba6a25dbd8669057e123b02812e16138589e # v2.62.48
