@@ -50,7 +50,7 @@ jobs:
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@8cd2ac21dc357ca7dd807fe294d11e9ef84f60ec # v2.62.53
         with:
-          tool: cargo-nextest@0.9.113
+          tool: cargo-nextest@0.9.114
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
@@ -76,7 +76,7 @@ jobs:
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@8cd2ac21dc357ca7dd807fe294d11e9ef84f60ec # v2.62.53
         with:
-          tool: cargo-nextest@0.9.113
+          tool: cargo-nextest@0.9.114
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
@@ -101,7 +101,7 @@ jobs:
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@8cd2ac21dc357ca7dd807fe294d11e9ef84f60ec # v2.62.53
         with:
-          tool: cargo-nextest@0.9.113
+          tool: cargo-nextest@0.9.114
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
