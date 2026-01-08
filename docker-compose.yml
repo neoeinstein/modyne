@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   localstack:
-    image: localstack/localstack@sha256:23fc9ddc0f023cbf526b15b86d134c9cfa325396d7b2f4a2047f6abcdc359713 # 3.3.0
+    image: localstack/localstack@sha256:f143b6156338bb98dff5efcfcda840592ca3d635ba53dca0416128fdf21f2811 # 3.3.0
     volumes:
       - "/private${TMPDIR}/localstack:/var/lib/localstack"
       # - "./localstack:/docker-entrypoint-initaws.d"
