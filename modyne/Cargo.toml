@@ -1,6 +1,6 @@
 [package]
 name = "modyne"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Marcus Griep <marcus@griep.us>"]
 description = "High-level crate for interacting with single-table DynamoDB instances"
 readme = "../README.md"
@@ -38,7 +38,7 @@ tracing = "0.1.36"
 # is compatible with exactly one modyne release because the generated code
 # involves nonpublic APIs which are not bound by semver.
 [target.'cfg(any())'.dependencies]
-modyne-derive = { version = "=0.3.0", path = "../modyne-derive" }
+modyne-derive = { version = "=0.3.1", path = "../modyne-derive" }
 
 [package.metadata.docs.rs]
 features = ["derive"]

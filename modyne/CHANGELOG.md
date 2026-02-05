@@ -2,6 +2,24 @@
 
 The format of this changelog is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.1](https://github.com/neoeinstein/modyne/compare/modyne-v0.3.0...modyne-v0.3.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* bump MSRV ([#93](https://github.com/neoeinstein/modyne/issues/93)) ([5a914b5](https://github.com/neoeinstein/modyne/commit/5a914b50a100cf386dfd47b5687e4fe7f9d2ed72))
+* commit for versioning ([340e66c](https://github.com/neoeinstein/modyne/commit/340e66c3bce5c2f2e5777ce4472954b9b09260a7))
+* **deps:** update rust crate thiserror to v2 ([#148](https://github.com/neoeinstein/modyne/issues/148)) ([5559508](https://github.com/neoeinstein/modyne/commit/5559508788dcc242977e973195c310d37b21f69c))
+* un-pin modyne-derive ([32b1cdb](https://github.com/neoeinstein/modyne/commit/32b1cdb05324764849661de4c0eb163e71a87a4a))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * modyne-derive bumped from 0.3 to 0.3.1
+    * modyne-derive bumped from =0.3.0 to 0.3.1
+
 ## [Unreleased]
 
 ## [0.3.0] - 2023-12-07
