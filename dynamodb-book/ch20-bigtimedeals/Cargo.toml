@@ -18,7 +18,7 @@ once_cell = []
 
 [dependencies]
 aliri_braid = "0.4.0"
-aws-sdk-dynamodb = "1.3.0"
+aws-sdk-dynamodb = "1.98.0"
 futures = "0.3.27"
 modyne = { version = "0.3.0", path = "../../modyne", features = ["derive"] }
 pin-project-lite = "0.2.9"
