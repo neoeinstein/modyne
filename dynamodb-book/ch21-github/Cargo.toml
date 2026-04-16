@@ -19,7 +19,7 @@ once_cell = []
 
 [dependencies]
 aliri_braid = "0.4.0"
-aws-sdk-dynamodb = "1.3.0"
+aws-sdk-dynamodb = "1.98.0"
 castaway = "0.2.2"
 compact_str = { version = "0.9.0", features = ["serde"] }
 modyne = { version = "0.3.0", path = "../../modyne", features = ["derive"] }
