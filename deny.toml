@@ -110,9 +110,11 @@ confidence-threshold = 0.8
 # Allow 1 or more licenses on a per-crate basis, so that particular licenses
 # aren't accepted for every possible crate as with the normal allow list
 exceptions = [
-    # Each entry is the crate and version constraint, and its specific allow
-    # list
-    #{ allow = ["Zlib"], name = "adler32", version = "*" },
+    # aws-lc-fips-sys ships AWS-LC's FIPS-validated build, which retains
+    # OpenSSL-licensed code from BoringSSL/OpenSSL ancestry. The license is
+    # unavoidable for any FIPS-capable TLS path and is only pulled in when
+    # the `rustls-aws-lc-fips` feature is enabled.
+    { allow = ["OpenSSL"], name = "aws-lc-fips-sys", version = "*" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,

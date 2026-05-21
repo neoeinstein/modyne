@@ -14,7 +14,6 @@ use modyne::{
 };
 use serde_dynamo::string_set::StringSet;
 use svix_ksuid::{Ksuid, KsuidLike};
-use time::format_description::well_known::Rfc3339;
 
 #[derive(Clone, Debug)]
 pub struct App {
@@ -1184,7 +1183,7 @@ impl QueryInput for BrandDealsByDateQuery<'_> {
     type Aggregate = Vec<Deal>;
 
     fn key_condition(&self) -> expr::KeyCondition<Self::Index> {
-        let date = self.date.format(&Rfc3339).unwrap();
+        let date = self.date;
         let partition = format!("BRAND#{}#{date}", self.brand).to_ascii_uppercase();
         let bound = self
             .last_seen
@@ -1208,7 +1207,7 @@ impl QueryInput for CategoryDealsByDateQuery<'_> {
     type Aggregate = Vec<Deal>;
 
     fn key_condition(&self) -> expr::KeyCondition<Self::Index> {
-        let date = self.date.format(&Rfc3339).unwrap();
+        let date = self.date;
         let partition = format!("CATEGORY#{}#{date}", self.category).to_ascii_uppercase();
         let bound = self
             .last_seen
