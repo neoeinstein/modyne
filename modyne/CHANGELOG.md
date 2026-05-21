@@ -4,6 +4,18 @@ The format of this changelog is based on [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
+_Note_: Following the updated MSRV of the AWS SDK, Modyne has updated its MSRV to 1.91.0
+
+- New: Added feature flags to select the AWS SDK runtime/HTTP stack
+  (`rt-tokio`, `default-https-client`) and the TLS/crypto provider
+  (`rustls-aws-lc`, `rustls-aws-lc-fips`, `rustls-ring`, `s2n-tls`)
+  independently. The defaults preserve the previous behavior
+  (Tokio + hyper 1.x + rustls + aws-lc-rs).
+- BREAKING: `aws-sdk-dynamodb` is now pulled in with `default-features = false`.
+  Consumers relying on the SDK's `behavior-version-latest` or other non-default
+  features must enable them explicitly.
+- Cleanup: Removed the unused `aws-config` dependency.
+
 ## [0.3.0] - 2023-12-07
 
 _Note_: Due to the updated MSRV of the AWS SDK, Modyne has updated its MSRV to 1.68.0
