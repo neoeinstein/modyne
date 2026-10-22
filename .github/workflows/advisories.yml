@@ -1,0 +1,32 @@
+name: Advisories
+
+# Security advisories against Cargo.lock. Runs daily and on main, never on
+# pull requests. A failure here needs a fix or an ignore in deny.toml;
+# GitHub emails the workflow's last editor when a scheduled run fails.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+    paths: [Cargo.lock, deny.toml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  advisories:
+    name: cargo deny (advisories)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: taiki-e/install-action@650c5ca14212efbbf3e580844b04bdccf68dac31 # v2.67.18
+        with:
+          tool: cargo-deny@0.20.2
+      - run: .github/scripts/deny-report.sh advisories
