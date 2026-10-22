@@ -41,9 +41,9 @@ jobs:
       release-modyne-derive: ${{ steps.release-please.outputs['modyne-derive--release_created'] }}
       release-modyne: ${{ steps.release-please.outputs['modyne--release_created'] }}
       release-example-ch18: ${{ steps.release-please.outputs['dynamodb-book/ch18-sessionstore--release_created'] }}
-      release-example-ch19: ${{ steps.release-please.outputs['dynamodb-book/ch19-sessionstore--release_created'] }}
-      release-example-ch20: ${{ steps.release-please.outputs['dynamodb-book/ch20-sessionstore--release_created'] }}
-      release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-sessionstore--release_created'] }}
+      release-example-ch19: ${{ steps.release-please.outputs['dynamodb-book/ch19-ecomm--release_created'] }}
+      release-example-ch20: ${{ steps.release-please.outputs['dynamodb-book/ch20-bigtimedeals--release_created'] }}
+      release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-github--release_created'] }}
   release:
     if: needs.release-please.outputs.releases == 'true'
     runs-on: ubuntu-24.04
@@ -56,7 +56,7 @@ jobs:
         if: needs.release-please.outputs.release-modyne-derive == 'true'
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p modyne_derive
+        run: cargo publish -p modyne-derive
         shell: bash
       - name: Publish modyne crate
         if: needs.release-please.outputs.release-modyne == 'true'
