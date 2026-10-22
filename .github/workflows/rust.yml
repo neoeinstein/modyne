@@ -33,13 +33,10 @@ jobs:
     name: Test Minimal Versions
     runs-on: ubuntu-24.04
     services:
-      localstack:
-        image: localstack/localstack@sha256:f848a44f4c9a3792eb720661615caecb8b95046372b589c0bed1ccfa0a606e88 # 3.3.0
+      dynamodb:
+        image: amazon/dynamodb-local@sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab # 3.3.1
         ports:
-          - 4566:4566
-        env:
-          SERVICES: dynamodb
-          EAGER_SERVICE_LOADING: 1
+          - 8000:8000
     env:
       RUST_LOG: info
       RUST_LOG_SPAN_EVENTS: close
@@ -77,13 +74,10 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
     services:
-      localstack:
-        image: localstack/localstack@sha256:f848a44f4c9a3792eb720661615caecb8b95046372b589c0bed1ccfa0a606e88 # 3.3.0
+      dynamodb:
+        image: amazon/dynamodb-local@sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab # 3.3.1
         ports:
-          - 4566:4566
-        env:
-          SERVICES: dynamodb
-          EAGER_SERVICE_LOADING: 1
+          - 8000:8000
     env:
       RUST_LOG: info
       RUST_LOG_SPAN_EVENTS: close

@@ -8,11 +8,11 @@ use modyne::{
 };
 
 #[test_log::test(tokio::test)]
-#[ignore = "this test requires a local DynamoDB instance running on localhost:4566 and may be \
+#[ignore = "this test requires a local DynamoDB instance running on localhost:8000 and may be \
             slow"]
-async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn dynamodb_local_test() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
-        .endpoint_url("http://localhost:4566")
+        .endpoint_url("http://localhost:8000")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
         ))
@@ -85,11 +85,11 @@ async fn localstack_only_test() -> Result<(), Box<dyn std::error::Error + Send +
 }
 
 #[test_log::test(tokio::test)]
-#[ignore = "this test requires a local DynamoDB instance running on localhost:4566 and may be \
+#[ignore = "this test requires a local DynamoDB instance running on localhost:8000 and may be \
             slow"]
 async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
-        .endpoint_url("http://localhost:4566")
+        .endpoint_url("http://localhost:8000")
         .credentials_provider(aws_credential_types::Credentials::new(
             "test", "test", None, None, "static",
         ))
