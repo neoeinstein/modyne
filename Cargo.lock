@@ -738,7 +738,7 @@ checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
 
 [[package]]
 name = "dynamodb-book-ch18-sessionstore"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aliri_braid",
  "aws-config",
@@ -756,7 +756,7 @@ dependencies = [
 
 [[package]]
 name = "dynamodb-book-ch19-ecomm"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aliri_braid",
  "aws-config",
@@ -774,7 +774,7 @@ dependencies = [
 
 [[package]]
 name = "dynamodb-book-ch20-bigtimedeals"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aliri_braid",
  "aws-config",
@@ -795,7 +795,7 @@ dependencies = [
 
 [[package]]
 name = "dynamodb-book-ch21-github"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aliri_braid",
  "aws-config",
@@ -1337,7 +1337,7 @@ dependencies = [
 
 [[package]]
 name = "modyne"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "aliri_braid",
  "async-trait",
@@ -1354,7 +1354,7 @@ dependencies = [
 
 [[package]]
 name = "modyne-derive"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "pretty_assertions",
  "proc-macro2",
