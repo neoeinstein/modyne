@@ -7,5 +7,10 @@
     ":automergeDigest",
     "local>neoeinstein/renovate-config//actions/automerge-non-breaking-build-tools",
     ":rebaseStalePrs"
-  ]
+  ],
+  "lockfileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["before 6am on monday"]
+  }
 }
