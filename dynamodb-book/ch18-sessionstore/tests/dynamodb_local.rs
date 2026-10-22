@@ -124,7 +124,7 @@ async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send +
             username: Username::from(format!("mtest_{}", i % 7)),
             created_at: time::OffsetDateTime::now_utc(),
             expires_at: time::OffsetDateTime::now_utc(),
-            ttl: Expiry::from(time::OffsetDateTime::now_utc()),
+            ttl: Expiry::from(time::OffsetDateTime::now_utc() + time::Duration::hours(1)),
         };
         Some(put)
     })
@@ -176,7 +176,7 @@ async fn batch_put_get_delete() -> Result<(), Box<dyn std::error::Error + Send +
         username: Username::from("mtest"),
         created_at: time::OffsetDateTime::now_utc(),
         expires_at: time::OffsetDateTime::now_utc(),
-        ttl: Expiry::from(time::OffsetDateTime::now_utc()),
+        ttl: Expiry::from(time::OffsetDateTime::now_utc() + time::Duration::hours(1)),
     }
     .put()
     .execute(&app)
