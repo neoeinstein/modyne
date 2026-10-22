@@ -8,9 +8,24 @@
     "local>neoeinstein/renovate-config//actions/automerge-non-breaking-build-tools",
     ":rebaseStalePrs"
   ],
-  "lockfileMaintenance": {
+  "minimumReleaseAge": "14 days",
+  "internalChecksFilter": "strict",
+  "lockFileMaintenance": {
     "enabled": true,
     "automerge": true,
     "schedule": ["before 6am on monday"]
-  }
+  },
+  "packageRules": [
+    {
+      "description": "Action updates merge themselves once every check passes and the release is 14 days old.",
+      "matchManagers": ["github-actions"],
+      "automerge": true
+    },
+    {
+      "description": "Docker digests carry no release date to age.",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"],
+      "minimumReleaseAge": null
+    }
+  ]
 }

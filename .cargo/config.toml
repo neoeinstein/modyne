@@ -1,0 +1,6 @@
+[registry]
+# Don't resolve crate versions published less than 14 days ago, unless
+# Cargo.lock already records them (RFC 3923). Cargo versions without the
+# option ignore it; until then, Renovate's minimumReleaseAge applies the same
+# window to update PRs.
+global-min-publish-age = "14 days"
