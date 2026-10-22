@@ -55,30 +55,23 @@ jobs:
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
 
+  # The MSRV is what builds against a lockfile resolved for it, not against the
+  # committed one, which tracks the latest SDK. The book crates are left out:
+  # they are examples, and their SDK feature floor needs a newer rustc.
   test-msrv:
     name: Test MSRV
     runs-on: ubuntu-24.04
-    services:
-      localstack:
-        image: localstack/localstack@sha256:f848a44f4c9a3792eb720661615caecb8b95046372b589c0bed1ccfa0a606e88 # 3.3.0
-        ports:
-          - 4566:4566
-        env:
-          SERVICES: dynamodb
-          EAGER_SERVICE_LOADING: 1
-    env:
-      RUST_LOG: info
-      RUST_LOG_SPAN_EVENTS: close
-      AWS_DEFAULT_REGION: us-east-1
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: dtolnay/rust-toolchain@1.88
+      - uses: dtolnay/rust-toolchain@1.80
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@650c5ca14212efbbf3e580844b04bdccf68dac31 # v2.67.18
         with:
           tool: cargo-nextest@0.9.126
-      - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
-      - run: cargo test --workspace --doc --no-fail-fast --features derive
+      - run: sed -i '/dynamodb-book/d' Cargo.toml
+      - run: rm Cargo.lock && CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS=fallback cargo +stable generate-lockfile
+      - run: cargo nextest run -p modyne -p modyne-derive --no-fail-fast --features derive
+      - run: cargo test -p modyne -p modyne-derive --doc --no-fail-fast --features derive
 
   test:
     name: Test
@@ -106,19 +99,35 @@ jobs:
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
   deny:
-    name: Check Constraints
+    name: Check Constraints (bans licenses sources)
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        checks:
-          - advisories
-          - bans licenses sources
-    continue-on-error: ${{ matrix.checks == 'advisories' }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
       - uses: taiki-e/install-action@650c5ca14212efbbf3e580844b04bdccf68dac31 # v2.67.18
         with:
-          tool: cargo-deny@0.18.9
-      - run: cargo deny --all-features check ${{ matrix.checks }}
+          tool: cargo-deny@0.20.2
+      - run: cargo deny --locked --all-features check bans licenses sources
+
+  # Advisories against dependencies already on main run daily
+  # (advisories.yml); a pull request fails only for advisories it introduces,
+  # so a newly published one never blocks unrelated changes or Renovate.
+  new-advisories:
+    name: Check Constraints (new advisories)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@f13886b937689c021905a6b90929199931d60db1 # v2.8.1
+      - uses: taiki-e/install-action@650c5ca14212efbbf3e580844b04bdccf68dac31 # v2.67.18
+        with:
+          tool: cargo-deny@0.20.2
+      # Values reach the shell through env, never template expansion.
+      - run: .github/scripts/new-advisories.sh "$BASE_SHA"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}

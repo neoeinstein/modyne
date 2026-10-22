@@ -11,7 +11,7 @@ documentation = "https://docs.rs/dynamodb-book-ch21-github"
 homepage = "https://github.com/neoeinstein/modyne"
 repository = "https://github.com/neoeinstein/modyne"
 license = "MIT OR Apache-2.0"
-rust-version = "1.75.0"
+rust-version = "1.81.0"
 
 [features]
 default = []
@@ -19,7 +19,7 @@ once_cell = []
 
 [dependencies]
 aliri_braid = "0.4.0"
-aws-sdk-dynamodb = "1.3.0"
+aws-sdk-dynamodb = { version = "1.68.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 castaway = "0.2.2"
 compact_str = { version = "0.9.0", features = ["serde"] }
 modyne = { version = "0.3.0", path = "../../modyne", features = ["derive"] }
