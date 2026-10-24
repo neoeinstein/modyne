@@ -11,7 +11,7 @@ on:
 
 jobs:
   release-please:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - id: release-please
         uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
@@ -46,7 +46,7 @@ jobs:
       release-example-ch21: ${{ steps.release-please.outputs['dynamodb-book/ch21-github--release_created'] }}
   release:
     if: needs.release-please.outputs.releases == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: release-please
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
