@@ -1,6 +1,6 @@
 [package]
 name = "dynamodb-book-ch18-sessionstore"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 authors = ["Marcus Griep <marcus@griep.us>"]
 description = "Models from The DynamoDB Book Session Store example"

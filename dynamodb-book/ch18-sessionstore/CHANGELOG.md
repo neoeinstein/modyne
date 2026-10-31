@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/neoeinstein/modyne/compare/dynamodb-book-ch18-sessionstore-v0.3.1...dynamodb-book-ch18-sessionstore-v0.3.2) (2026-10-31)
+
+
+### Bug Fixes
+
+* **book:** keep ch18 batch test sessions from expiring mid-test ([#332](https://github.com/neoeinstein/modyne/issues/332)) ([5ed9c96](https://github.com/neoeinstein/modyne/commit/5ed9c96fa85d0cfdde557e16af53a61868d13ad8))
+
 ## [0.3.1](https://github.com/neoeinstein/modyne/compare/dynamodb-book-ch18-sessionstore-v0.3.0...dynamodb-book-ch18-sessionstore-v0.3.1) (2026-10-22)
 
 
