@@ -47,7 +47,7 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - uses: taiki-e/install-action@682ce6c3c696a4cd5168a05f98e51aa02b877941 # v2.89.1
         with:
-          tool: cargo-nextest@0.9.150
+          tool: cargo-nextest@0.9.151
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all -Zminimal-versions
       - run: cargo test  --workspace --doc --no-fail-fast --features derive -Zminimal-versions
 
@@ -64,7 +64,7 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - uses: taiki-e/install-action@682ce6c3c696a4cd5168a05f98e51aa02b877941 # v2.89.1
         with:
-          tool: cargo-nextest@0.9.150
+          tool: cargo-nextest@0.9.151
       - run: sed -i '/dynamodb-book/d' Cargo.toml
       - run: rm Cargo.lock && CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS=fallback cargo +stable generate-lockfile
       - run: cargo nextest run -p modyne -p modyne-derive --no-fail-fast --features derive
@@ -88,7 +88,7 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - uses: taiki-e/install-action@682ce6c3c696a4cd5168a05f98e51aa02b877941 # v2.89.1
         with:
-          tool: cargo-nextest@0.9.150
+          tool: cargo-nextest@0.9.151
       - run: cargo nextest run --workspace --no-fail-fast --features derive --run-ignored all
       - run: cargo test --workspace --doc --no-fail-fast --features derive
 
